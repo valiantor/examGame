@@ -16,7 +16,7 @@
 
 	<insert id="addLevel" parameterType="com.valiantor.entity.Level">
 		insert into level(grade,experience_need,description,rate)
-		values(#{level.grade},#{level.experience_need},#{level.description},#{level.rate})
+		values(#{level.grade},#{level.experienceNeed},#{level.description},#{level.rate})
 
 	</insert>
 
