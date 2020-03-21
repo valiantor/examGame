@@ -20,7 +20,6 @@ public class AdminService {
      */
     public boolean login(String aId,String password){
         Admin admin = adminDao.findAdminByAIdAndPassword(aId, password);
-        if(admin == null)  return false;
-        return true;
+        return admin==null?false:true;
     }
 }

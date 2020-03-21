@@ -3,18 +3,22 @@
         "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
 
 <!-- namespace映射文件的namespace必须等于Mapper映射器的全限定名 -->
-<mapper namespace="com.valiantor.dao.AdminDao">
+<mapper namespace="com.valiantor.dao.LevelDao">
 
 <!--    <resultMap type="com.valiantor.entity.Admin" id="adminMap">
         <result column="a_id" property="aId"/>
         <result column="password" property="password"/>
     </resultMap>-->
 
-    <select id="findAdminByAIdAndPassword" resultType="com.valiantor.entity.Admin" parameterType="String">
-		select * from admin
-		where a_id = #{aId}
-		and password = #{password}
+    <select id="findAllLevel" resultType="com.valiantor.entity.Level">
+		select * from level
 	</select>
+
+	<insert id="addLevel" parameterType="com.valiantor.entity.Level">
+		insert into level(grade,experience_need,description,rate)
+		values(#{level.grade},#{level.experience_need},#{level.description},#{level.rate})
+
+	</insert>
 
 
     <!-- purchase(p_no, title, content, type, publish_date, end_date, c_no, s_id)

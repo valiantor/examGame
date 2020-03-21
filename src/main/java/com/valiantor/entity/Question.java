@@ -11,6 +11,7 @@ public class Question {
     private String choiceE;
     private String correctOption;
     private String answerAnalysis;
+    private int experienceValue;
     private int lNo;//外码
 
 
@@ -86,11 +87,36 @@ public class Question {
         this.answerAnalysis = answerAnalysis;
     }
 
+    public int getExperienceValue() {
+        return experienceValue;
+    }
+
+    public void setExperienceValue(int experienceValue) {
+        this.experienceValue = experienceValue;
+    }
+
     public int getlNo() {
         return lNo;
     }
 
     public void setlNo(int lNo) {
         this.lNo = lNo;
+    }
+
+    @Override
+    public String toString() {
+        return "Question{" +
+                "qNo=" + qNo +
+                ", testPoint='" + testPoint + '\'' +
+                ", choiceA='" + choiceA + '\'' +
+                ", choiceB='" + choiceB + '\'' +
+                ", choiceC='" + choiceC + '\'' +
+                ", choiceD='" + choiceD + '\'' +
+                ", choiceE='" + choiceE + '\'' +
+                ", correctOption='" + correctOption + '\'' +
+                ", answerAnalysis='" + answerAnalysis + '\'' +
+                ", experienceValue=" + experienceValue +
+                ", lNo=" + lNo +
+                '}';
     }
 }

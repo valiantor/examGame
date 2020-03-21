@@ -3,6 +3,7 @@ package com.valiantor.entity;
 public class Level {
     private int lNo;
     private int grade;
+    private int experienceNeed;
     private String description;
     private int rate;
 
@@ -20,6 +21,14 @@ public class Level {
 
     public void setGrade(int grade) {
         this.grade = grade;
+    }
+
+    public int getExperienceNeed() {
+        return experienceNeed;
+    }
+
+    public void setExperience_need(int experienceNeed) {
+        this.experienceNeed = experienceNeed;
     }
 
     public String getDescription() {
@@ -41,8 +50,9 @@ public class Level {
     @Override
     public String toString() {
         return "Level{" +
-                "lNo='" + lNo + '\'' +
+                "lNo=" + lNo +
                 ", grade=" + grade +
+                ", experienceNeed=" + experienceNeed +
                 ", description='" + description + '\'' +
                 ", rate=" + rate +
                 '}';
