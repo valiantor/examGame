@@ -5,22 +5,20 @@
         function checkSession(){
 
             $.ajax({
-                url:"/user/getCurrentUser",
+                url:"/admin/getCurrentAdmin",
                 type: "get",
                 dataType: "text",
                 success: function (result) {
 
-
-                    alert("result:"+result);
                     if(result == "" || null == result) {
 
-                        // window.location="login.html";
-                        $("#user_info").text("未登录");
+                        window.location="admin_login.html";
+                        $("#admin_info").text("未登录");
                     }else{
 
-                        currentUser = $.parseJSON(result);
-                        $("#user_info").text($.parseJSON(result).name+" 已登陆");
 
+                        $("#admin_info").text(result+" 已登陆");
+                        $("#admin_login").addClass("invisible");
                     }
                 } ,
                 error: function (e) {
@@ -28,8 +26,6 @@
                 }
             });
         }
-
-
 
         checkSession();
 
@@ -42,14 +38,15 @@
     <div class="top-bar-left">
         <ul class="dropdown menu" data-dropdown-menu>
             <li class="menu-text">关卡</li>
-            <li><a href="login.html">登陆</a></li>
-            <li><span id="user_info"></span> </li>
+            <li class="invisible" id="admin_login"><a href="admin_login.html">登陆</a></li>
+            <li><span id="admin_info"></span> </li>
+
         </ul>
     </div>
     <div class="top-bar-right">
         <ul class="menu">
             <li><input type="search" id="search_content" placeholder="Search"></li>
-            <li><button type="button" class="button"  onclick="searchNews()">查找</button></li>
+            <li><button type="button" class="button"  onclick="searchQuestion()">查找</button></li>
         </ul>
     </div>
 </div>

@@ -3,6 +3,7 @@ package com.valiantor.entity;
 public class Question {
 
     private int qNo;
+    private String questionDescription;
     private String testPoint;
     private String choiceA;
     private String choiceB;
@@ -21,6 +22,14 @@ public class Question {
 
     public void setqNo(int qNo) {
         this.qNo = qNo;
+    }
+
+    public String getQuestionDescription() {
+        return questionDescription;
+    }
+
+    public void setQuestionDescription(String questionDescription) {
+        this.questionDescription = questionDescription;
     }
 
     public String getTestPoint() {

@@ -1,3 +1,9 @@
+
+.unfoces{
+	height: 100%;
+	overflow: hidden;
+}
+
 .bg_dark{
 	background-color: #0C3D5D;
 	color: #F1F1F1;
