@@ -21,6 +21,12 @@
         limit #{offset},#{numPerPage}
     </select>
 
+    <update id="deleteQuestionFromLevel"  parameterType="int">
+        update question
+        set l_no = null
+        where l_no = #{lNo} and q_no = #{qNo}
+    </update>
+
 
 
     <!-- purchase(p_no, title, content, type, publish_date, end_date, c_no, s_id)

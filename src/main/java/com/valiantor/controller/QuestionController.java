@@ -19,11 +19,9 @@ public class QuestionController {
      * @param lNo
      * @return
      */
-    @RequestMapping("findQuestionByLNo")
-    public List<Question> findQuestionByLNo(@RequestParam("lNo") int lNo){
-        if(questionService.findAllQuestionBylNo(lNo)==null){
-            return null;
-        }
+    @RequestMapping("findAllQuestionByLNo")
+    public List<Question> findAllQuestionByLNo(@RequestParam("lNo") int lNo){
+
         return questionService.findAllQuestionBylNo(lNo);
     }
 
@@ -35,11 +33,14 @@ public class QuestionController {
      * @return
      */
     @RequestMapping("findQuestionPageByLNo")
-    public List<Question> findQuestionPageByLNo(@RequestParam("lNo") int lNo,@RequestParam("currentPage") int currentPage,@RequestParam("numPerPage") int numPerPage){
-
+    public List<Question> finduestionPageByLNo(@RequestParam("lNo") int lNo,@RequestParam("currentPage") int currentPage,@RequestParam("numPerPage") int numPerPage){
 
         return questionService.findQuestionPageBylNo(lNo,currentPage,numPerPage);
     }
+    @RequestMapping("deleteQuestionFromLevel")
+    public Boolean deleteQuestionFromLevel(@RequestParam("qNo") int qNo,@RequestParam("lNo") int lNo){
 
+        return questionService.deleteQuestionFromLevel(qNo,lNo);
+    }
 
 }
