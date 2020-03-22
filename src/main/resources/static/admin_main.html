@@ -235,6 +235,7 @@
                     $("#level_rate").text(currentLevel.rate+"%");
 
                     $("#add_question_button").click({"lNo":lNo},showAddQuestion);
+                   // alert(result)
                     if(result != ""){
                         loadQuestions($.parseJSON(result));
                     }
@@ -288,8 +289,9 @@
         }
 
         function loadQuestions(questionList){
-            var tbody = $("#question_list tbody");
 
+            var tbody = $("#question_list tbody");
+            $(tbody).empty();
             for(var i = 0;i<questionList.length;i++) {
                 var question = questionList[i];
                 var tr = document.createElement("tr");
@@ -299,19 +301,47 @@
 
                 var td_operation = document.createElement("td");
                 var a_showInfo = document.createElement("a");
+                $(a_showInfo).text("查看 ")
                 var a_edit = document.createElement("a");
+                $(a_edit).text("编辑 ")
                 var a_delete = document.createElement("a");
+                $(a_delete).text("删除 ")
+                $(a_delete).click({"qNo":question.qNo},deleteQuestionFromLevel);
                 $(td_operation).append(a_showInfo, a_edit, a_delete);
 
-                $(tr).append(td_description, td_test_point, td_experience_value), td_operation;
+                $(tr).append(td_description, td_test_point, td_experience_value, td_operation);
 
-                $(td_description).val(question.questionDescription)
-                $(td_test_point).val(question.testPoint)
-                $(td_experience_value).val(question.experienceValue)
+                $(td_description).text(question.questionDescription)
+                $(td_test_point).text(question.testPoint)
+                $(td_experience_value).text(question.experienceValue)
+
+                $(tbody).append(tr)
             }
 
         }
 
+        function  deleteQuestionFromLevel(d) {
+            var qNo = d.data.qNo;
+            $.ajax({
+                url: "/question/deleteQuestionFromLevel",
+                dataType: "text",
+                type: "post",
+                data: {"qNo":qNo},
+                success: function (result) {
+
+                    if(result == "true"){
+                        //重新加载题目列表
+                        findAllQuestionByLNo(currentLevel.lNo);
+                    }
+                },
+                error: function (e) {
+                    alert("错误")
+                }
+            });
+
+        }
+        
+        
         function closeAddLevelPanel(){
             $('#add_level').fadeOut(500);
             $("html").removeClass("unfoces");
@@ -421,7 +451,7 @@
                     </thead>
                     <tbody>
                     <tr>
-                        <td></td><td></td><td></td><td><a>查看</a><a>编辑</a><a>删除</a></td>
+                        <td></td><td></td><td></td><td><a>查看 </a><a>编辑 </a><a>删除</a></td>
                     </tr>
 
                     </tbody>
