@@ -78,12 +78,26 @@
             var description = $("#description").val();
             var rate = $("#rate").val();
 
+
+
+            var r = /^\+?[1-9][0-9]*$/;　　//正整数正则
+
             if(grade=="" || experience_need == "" || description == "" || rate == ""){
                 $("#level_message").text("请输入完整").css({color:"red"});
                 return false;
             }
+            if(! r.test(experience_need)){
+                $("#level_message").text("所需经验应为整数").css({color:"red"});
+                return false;
+            }
             if(experience_need <= lastLevel.experienceNeed){
                 $("#level_message").text("所需经验应大于"+lastLevel.experienceNeed).css({color:"red"});
+                return false;
+            }
+
+
+            if(! r.test(rate)){
+                $("#level_message").text("通过率应为整数").css({color:"red"});
                 return false;
             }
             if(rate <= 0 || rate > 100){
@@ -122,6 +136,8 @@
 
         function addQuestion(){
 
+
+
             var question_description = $("#question_description").val();
             var test_point = $("#test_point").val();
             var choice_a = $("#choice_a").val();
@@ -139,6 +155,31 @@
                 return false;
             }
 
+            var arr = new Array();
+            if(choice_a.trim() != "") arr.push("A")
+            if(choice_b.trim() != "") arr.push("B")
+            if(choice_c.trim() != "") arr.push("C")
+            if(choice_d.trim() != "") arr.push("D")
+            if(choice_e.trim() != "") arr.push("E")
+            var isCorrect = false;
+            var message_choice = ""
+            for(var i = 0;i<arr.length;i++){
+                if(correct_option.trim() == arr[i]){
+                    isCorrect = true;
+                }
+                message_choice += arr[i];
+                if(i != arr.length-1) message_choice += ",";
+            }
+            if(!isCorrect){
+                $("#question_message").text("正确选项请输入："+message_choice).css({color:"red"});
+                return false;
+            }
+
+            var r = /^\+?[1-9][0-9]*$/;　　//正整数正则
+            if(! r.test(experience_value)){
+                $("#question_message").text("经验值/分值请输入整数").css({color:"red"});
+                return false;
+            }
 
             var question = new Object();
             question.questionDescription = question_description;
@@ -297,7 +338,7 @@
 
     <style>
         div{
-            border: 1px solid;
+            border: 0px solid;
         }
 
 
