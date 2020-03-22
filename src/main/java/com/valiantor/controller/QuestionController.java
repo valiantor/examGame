@@ -43,7 +43,7 @@ public class QuestionController {
      * @return
      */
 
-    public boolean addQuestion(@RequestParam("questionJson") String questionJson){
+    public boolean addQuestion(@RequestParam("question") String questionJson){
 
 
         return false;

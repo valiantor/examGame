@@ -15,7 +15,7 @@
     </script>
 
     <script>
-
+        var currentLevel;
         $(document).ready(function() {
             findAllLevel();
         });
@@ -60,11 +60,19 @@
                 div2.append(div3_2);
                 div1.append(div2);
 
+                $(div2).click({"level":level},showLevelInfo);
                 $("#content").append(div1);
 
             }
         }
 
+        function showLevelInfo(d){
+
+            currentLevel = d.data.level;
+
+            findAllQuestionByLNo(currentLevel.lNo);
+
+        }
 
 
         function addLevel(){
@@ -101,10 +109,137 @@
                 }
             });
         }
+        function addQuestion(){
+
+            var question_description = $("#question_description").val();
+            var test_point = $("#test_point").val();
+            var choice_a = $("#choice_a").val();
+            var choice_b = $("#choice_b").val();
+            var choice_c = $("#choice_c").val();
+            var choice_d = $("#choice_d").val();
+            var choice_e = $("#choice_e").val();
+            var correct_option = $("#correct_option").val();
+            var answer_analysis = $("#answer_analysis").val();
+            var experience_value = $("#experience_value").val();
+            var lNo = currentLevel.lNo;
+
+            if(question_description == "" || choice_a == "" || choice_b == "" || correct_option == "" || experience_value == ""){
+                $("#question_message").text("请输入完整").css({color:"red"});
+                return false;
+            }
+
+            var question = new Object();
+            question.questionDescription = question_description;
+            question.testPoint = test_point;
+            question.choiceA = choice_a;
+            question.choiceB = choice_b;
+            question.choiceC = choice_c;
+            question.choiceD = choice_d;
+            question.choiceE = choice_e;
+            question.correctOption = correct_option;
+            question.answerAnalysis = answer_analysis;
+            question.experienceValue = experience_value;
+            question.lNo = lNo;
+
+            var questionJson = JSON.stringify(question);
+
+            $.ajax({
+                url: "/question/addQuestion",
+                dataType: "text",
+                data: {"question":questionJson},
+                success: function (result) {
+                    if(result == true){
+                        alert("添加成功");
+                    }
+                },
+                error: function (e) {
+                    alert("错误")
+                }
+            });
+        }
+
+        function findAllQuestionByLNo(lNo){
+            $.ajax({
+                url: "/question/findAllQuestionByLNo",
+                dataType: "text",
+                type: "post",
+                data: {"lNo":lNo},
+                success: function (result) {
+                    var maxw = document.documentElement.clientWidth;
+                    var maxh = document.documentElement.clientHeight;
+                    $("#level_info").css({"z-index":"90","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+                    $("#level_info").show();
+                    $("html").addClass("unfoces");
+                    $("body").addClass("unfoces");
+                    $("#add_question").addClass("unfoces");
+                    $("#level_title").text("关卡"+currentLevel.grade);
+                    $("#level_grade").text(currentLevel.grade);
+                    $("#level_description").text(currentLevel.description);
+                    $("#level_experience_need").text(currentLevel.experienceNeed);
+                    $("#level_rate").text(currentLevel.rate);
+
+                    $("#add_question_button").click({"lNo":lNo},showAddQuestion);
+                    if(result != ""){
+                        loadQuestions($.parseJSON(result));
+                    }
+                },
+                error: function (e) {
+                    alert("错误")
+                }
+            });
+        }
+
+        function showAddQuestion(d){
+
+            var lNo = d.data.lNo;
+            var maxw = document.documentElement.clientWidth;
+            var maxh = document.documentElement.clientHeight;
+            $("#add_question").css({"z-index":"91","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+            $("#add_question").show();
+            $("html").addClass("unfoces");
+            $("body").addClass("unfoces");
+            $("#level_info").addClass("unfoces");
+
+            $("#lNo").val(lNo);
 
 
-        function findQuestionBy(){
+        }
 
+        function loadQuestions(questionList){
+            var tbody = $("#question_list tbody");
+
+            for(var i = 0;i<questionList.length;i++) {
+                var question = questionList[i];
+                var tr = document.createElement("tr");
+                var td_description = document.createElement("td");
+                var td_test_point = document.createElement("td");
+                var td_experience_value = document.createElement("td");
+
+                var td_operation = document.createElement("td");
+                var a_showInfo = document.createElement("a");
+                var a_edit = document.createElement("a");
+                var a_delete = document.createElement("a");
+                $(td_operation).append(a_showInfo, a_edit, a_delete);
+
+                $(tr).append(td_description, td_test_point, td_experience_value), td_operation;
+
+                $(td_description).val(question.questionDescription)
+                $(td_test_point).val(question.testPoint)
+                $(td_experience_value).val(question.experienceValue)
+            }
+
+        }
+
+
+        function closeLevelInfoPanel(){
+            $('#level_info').fadeOut(500);
+            $("html").removeClass("unfoces");
+            $("body").removeClass("unfoces");
+        }
+        function closeAddQuestionPanel(){
+            $('#add_question').fadeOut(500);
+            $("html").removeClass("unfoces");
+            $("body").removeClass("unfoces");
         }
 
     </script>
@@ -150,6 +285,111 @@
 
     </div>
 </div>
+
+
+
+
+<div  id="level_info" style="position: fixed; display: none; padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
+    <div class="text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
+        <button class="button dark" data-open="comment_panel" id="add_question_button">添加选择题</button>
+        <button onclick="closeLevelInfoPanel()" class="button success">关闭</button>
+    </div>
+
+    <h3 id="level_title" style="font-weight: bold"></h3>
+    <div class="grid-padding-x">
+        <div class="cell small-12 medium-4" id="level_info_content">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>关卡等级:</td><td id="level_grade"></td>
+                    </tr>
+                    <tr>
+                        <td>描述:</td><td id="level_description"></td>
+                    </tr>
+                    <tr>
+                        <td>所需经验:</td><td id="level_experience_need"></td>
+                    </tr>
+                    <tr>
+                        <td>通关率:</td><td id="level_rate"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="cell small-12 medium-8" id="question_list">
+            <div>
+                <table>
+                    <thead>
+                        <th>
+                            <td>问题描述</td><td>考点</td><td>经验值</td><td>操作</td>
+                        </th>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td></td><td></td><td></td><td><a>查看</a><a>编辑</a><a>删除</a></td>
+                    </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+    <hr/>
+
+
+
+
+
+
+</div>
+
+
+
+<div  id="add_question" style="position: fixed; display: none; padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
+
+    <div class="content_center grid-container">
+        <h1>添加选择题</h1>
+        <div class="text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
+            <button onclick="closeAddQuestionPanel()" class="button success">关闭</button>
+        </div>
+        <input type="hidden" id="lNo" >
+        <label for="question_description">问题描述
+            <input type="text" placeholder="描述一下问题" id="question_description" >
+        </label>
+        <label for="test_point">考点
+            <input type="text" placeholder="考点" id="test_point" >
+        </label>
+        <label for="choice_a">A选项
+            <input type="text" placeholder="A选项" id="choice_a">
+        </label>
+        <label for="choice_b">B选项
+            <input type="text" placeholder="B选项" id="choice_b">
+        </label>
+        <label for="choice_c">C选项
+            <input type="text" placeholder="C选项" id="choice_c">
+        </label>
+        <label for="choice_d">D选项
+            <input type="text" placeholder="D选项" id="choice_d">
+        </label>
+        <label for="choice_e">E选项
+            <input type="text" placeholder="E选项" id="choice_e">
+        </label>
+        <label for="correct_option">正确选项
+            <input type="text" placeholder="正确选项" id="correct_option">
+        </label>
+        <label for="answer_analysis">答案解析
+            <input type="text" placeholder="答案解析" id="answer_analysis">
+        </label>
+        <label for="experience_value">分值/经验值
+            <input type="text" placeholder="分值/经验值" id="experience_value">
+        </label>
+        <button onclick="addQuestion()" class="button success">添加</button><span id="question_message"></span>
+
+    </div>
+</div>
+
+
 
 </body>
 </html>
