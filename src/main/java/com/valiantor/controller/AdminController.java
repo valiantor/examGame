@@ -36,6 +36,12 @@ public class AdminController {
         return "false";
     }
 
+    @RequestMapping("getCurrentAdmin")
+    public String getCurrentAdmin(HttpSession session){
+        Object aId = session.getAttribute("aId");
+        return aId==null?null:String.valueOf(aId);
+    }
+
 
 
 }
