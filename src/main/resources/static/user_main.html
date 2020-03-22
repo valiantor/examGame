@@ -15,6 +15,7 @@
     </script>
 
     <script>
+        var currentUser;
         var currentLevel;
         var lastLevel;
         $(document).ready(function() {
@@ -34,6 +35,8 @@
                 }
             });
         }
+
+
         function loadAllLevel(levelList){
             $("#content").empty();
             for(var i = 0;i<levelList.length;i++){
@@ -51,7 +54,12 @@
                 var div2 = document.createElement("div");
                 $(div2).addClass("grid-padding-x content_center").css({"box-shadow": "10px 10px 5px #888888","width":"150px","border-radius": "5px"});
                 var div3_1 = document.createElement("div");
-                $(div3_1).addClass("large-12 medium-12 ").css({"overflow":"hidden","background-color":"#3adb76", "height":"100px"});
+
+                if(currentUser.lNo >= level.lNo){
+                    $(div3_1).addClass("large-12 medium-12 ").css({"overflow":"hidden","background-color":"#3adb76", "height":"100px"});
+                }else{
+                    $(div3_1).addClass("large-12 medium-12 ").css({"overflow":"hidden","background-color":"#cacaca", "height":"100px"});
+                }
                 var span = document.createElement("span");
                 $(span).css("padding: 0px auto");
                 $(span).text("关卡"+grade);
@@ -70,44 +78,12 @@
         }
 
 
+        /**
+         * 获取当前关卡的排行信息
+         * @param lNo
+         */
+        function findCurrentRankInfo(lNo){
 
-
-
-
-
-
-
-        function findAllQuestionByLNo(lNo){
-            $.ajax({
-                url: "/question/findAllQuestionByLNo",
-                dataType: "text",
-                type: "post",
-                data: {"lNo":lNo},
-                success: function (result) {
-                    var maxw = document.documentElement.clientWidth;
-                    var maxh = document.documentElement.clientHeight;
-                    $("#level_info").css({"z-index":"90","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
-                    $("#level_info").show();
-                    $("html").addClass("unfoces");
-                    $("body").addClass("unfoces");
-                    $("#add_question").addClass("unfoces");
-                    $("#add_level").addClass("unfoces");
-                    $("#level_title").text("关卡"+currentLevel.grade);
-                    $("#level_grade").text(currentLevel.grade);
-                    $("#level_description").text(currentLevel.description);
-                    $("#level_experience_need").text(currentLevel.experienceNeed);
-                    $("#level_rate").text(currentLevel.rate+"%");
-
-                    $("#add_question_button").click({"lNo":lNo},showAddQuestion);
-                    // alert(result)
-                    if(result != ""){
-                        loadQuestions($.parseJSON(result));
-                    }
-                },
-                error: function (e) {
-                    alert("错误")
-                }
-            });
         }
 
 
@@ -117,9 +93,44 @@
         function showLevelInfo(d){
 
             currentLevel = d.data.level;
+            var maxw = document.documentElement.clientWidth;
+            var maxh = document.documentElement.clientHeight;
+            $("#level_info").css({"z-index":"90","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+            $("#level_info").show();
+            $("html").addClass("unfoces");
+            $("body").addClass("unfoces");
+            $("#add_question").addClass("unfoces");
+            $("#add_level").addClass("unfoces");
+            $("#level_title").text("关卡"+currentLevel.grade);
+            $("#level_grade").text(currentLevel.grade);
+            $("#level_description").text(currentLevel.description);
+            $("#level_experience_need").text(currentLevel.experienceNeed);
+            $("#level_rate").text(currentLevel.rate+"%");
 
-            findAllQuestionByLNo(currentLevel.lNo);
+            $("#start_answer_button").click({"lNo":lNo},showStartAnswer);
+          //  findCurrentRankInfo(currentLevel.lNo);
 
+        }
+
+        /**
+         * 开始答题
+         * @param d
+         */
+        function showStartAnswer(d){
+            var lNo = d.data.lNo;
+            var num = 5;
+            $.ajax({
+                url: "/question/findRandomQuestionByLNoAndNum",
+                dataType: "text",
+                data: "lNo="+u_id+"&num="+num,
+                success: function (result) {
+                    var questionList = $.parseJSON(result);
+                    loadQuestions(levelList);
+                },
+                error: function (e) {
+                    alert("错误")
+                }
+            });
         }
 
         function loadQuestions(questionList){
@@ -187,7 +198,7 @@
             <!--div2-->
             <div class="grid-padding-x content_center" style="box-shadow: 10px 10px 5px #888888; width: 150px;border-radius: 5px">
                 <!--div3_img-->
-                <div class="large-12 medium-12 content_center" style="overflow: hidden; background-color: #3adb76; height: 100px;">
+                <div class="large-12 medium-12 content_center" style="overflow: hidden; background-color: #cacaca; height: 100px;">
                     <span style="padding: 0px auto">关卡1</span>
                 </div>
                 <!--div3_content-->
@@ -212,7 +223,7 @@
 
 <div  id="level_info" style="position: fixed; display: none; padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
     <div class="text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
-        <button class="button dark" data-open="comment_panel" id="add_question_button">添加选择题</button>
+        <button class="button dark" data-open="comment_panel" id="start_answer_button">开始答题</button>
         <button onclick="closeLevelInfoPanel()" class="button success">关闭</button>
     </div>
 
@@ -236,7 +247,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="cell small-12 medium-8" id="question_list">
+       <!-- <div class="cell small-12 medium-8" id="question_list">
             <div>
                 <table>
                     <thead>
@@ -252,7 +263,7 @@
                     </tbody>
                 </table>
 
-            </div>
+            </div>-->
         </div>
 
     </div>

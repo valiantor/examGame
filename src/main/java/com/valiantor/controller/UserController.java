@@ -48,4 +48,15 @@ public class UserController {
 
         return null;
     }
+
+
+    /**
+     * 判断当前userId是否在数据库中已经存在，如果存在则返回false,如果不存在返回true
+     * @param uId
+     * @return
+     */
+    @RequestMapping("checkUserId")
+    public boolean checkUserId(String uId){
+        return false;
+    }
 }

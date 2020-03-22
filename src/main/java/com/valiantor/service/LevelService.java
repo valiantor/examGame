@@ -21,4 +21,8 @@ public class LevelService {
         int row = levelDao.addLevel(level);
         return row > 0;
     }
+
+    public Level findLevelByLNo(String lNo) {
+        return levelDao.findLevelByLNo(lNo);
+    }
 }

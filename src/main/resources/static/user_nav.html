@@ -16,8 +16,8 @@
                         $("#admin_info").text("未登录");
                     }else{
 
-
-                        $("#admin_info").text(result+" 已登陆");
+                        currentUser = $.parseJSON(result);
+                        $("#admin_info").text(currentUser.name+" 已登陆");
                         $("#admin_login").addClass("invisible");
                     }
                 } ,

@@ -34,4 +34,9 @@ public class LevelController {
         return levelService.addLevel(level);
 
     }
+
+    @RequestMapping("findLevelByLNo")
+    public Level findLevelByLNo(String lNo){
+        return levelService.findLevelByLNo(lNo);
+    }
 }

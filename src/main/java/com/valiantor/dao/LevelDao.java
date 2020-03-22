@@ -11,4 +11,6 @@ public interface LevelDao {
 
     public List<Level> findAllLevel();
     public int addLevel(@Param("level") Level level);
+
+    Level findLevelByLNo(String lNo);
 }
