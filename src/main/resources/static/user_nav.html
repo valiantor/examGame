@@ -5,7 +5,7 @@
         function checkSession(){
 
             $.ajax({
-                url:"/admin/getCurrentAdmin",
+                url:"/user/getCurrentUser",
                 type: "get",
                 dataType: "text",
                 success: function (result) {

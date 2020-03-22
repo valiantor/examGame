@@ -20,8 +20,8 @@ public class QuestionService {
        return questionDao.findQuestionPageBylNo(lNo,offset,numPerPage);
     }
 
-    public Boolean deleteQuestionFromLevel(int qNo,int lNo){
-        int row = questionDao.deleteQuestionFromLevel(qNo,lNo);
+    public Boolean deleteQuestionFromLevel(int qNo){
+        int row = questionDao.deleteQuestionFromLevel(qNo);
         return row>0;
     }
 

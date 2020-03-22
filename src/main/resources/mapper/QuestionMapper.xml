@@ -24,7 +24,7 @@
     <update id="deleteQuestionFromLevel"  parameterType="int">
         update question
         set l_no = null
-        where l_no = #{lNo} and q_no = #{qNo}
+        where q_no = #{qNo}
     </update>
 
 

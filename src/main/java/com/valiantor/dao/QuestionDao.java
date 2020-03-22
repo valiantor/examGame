@@ -10,5 +10,5 @@ import java.util.List;
 public interface QuestionDao {
     public List<Question> findAllQuestionBylNo(int lNo);
     public List<Question> findQuestionPageBylNo(@Param("lNo") int lNo, @Param("offset") int offset, @Param("numPerPage") int numPerPage);
-    public int deleteQuestionFromLevel(@Param("qNo") int qNo,@Param("lNo") int lNo);
+    public int deleteQuestionFromLevel(@Param("qNo") int qNo);
 }

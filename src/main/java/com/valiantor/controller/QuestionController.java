@@ -38,9 +38,9 @@ public class QuestionController {
         return questionService.findQuestionPageBylNo(lNo,currentPage,numPerPage);
     }
     @RequestMapping("deleteQuestionFromLevel")
-    public Boolean deleteQuestionFromLevel(@RequestParam("qNo") int qNo,@RequestParam("lNo") int lNo){
+    public Boolean deleteQuestionFromLevel(@RequestParam("qNo") int qNo){
 
-        return questionService.deleteQuestionFromLevel(qNo,lNo);
+        return questionService.deleteQuestionFromLevel(qNo);
     }
 
 }
