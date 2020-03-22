@@ -95,12 +95,10 @@
             user.profile = profile;
             var userJson = JSON.stringify(user);
             $.ajax({
-                url: "/user/registerUser",
+                url: "/user/userRegister",
                 type: "post",
-                data: {"user":userJson},
+                data: {"userJson":userJson},
                 dataType: "text",
-                processData: false,
-                contentType: false,
                 success:function(result){
 
                     if(result=="true"){
@@ -151,7 +149,7 @@
 
                     <div class="cell">
                         <label>个人简介
-                            <input type="password" id="profile" placeholder="个人简介">
+                            <input type="text" id="profile" placeholder="个人简介">
                         </label>
                     </div>
 

@@ -116,6 +116,7 @@ public class Question {
     public String toString() {
         return "Question{" +
                 "qNo=" + qNo +
+                ", questionDescription='" + questionDescription + '\'' +
                 ", testPoint='" + testPoint + '\'' +
                 ", choiceA='" + choiceA + '\'' +
                 ", choiceB='" + choiceB + '\'' +

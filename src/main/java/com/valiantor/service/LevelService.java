@@ -26,7 +26,8 @@ public class LevelService {
     public Level findLevelByGrade(int grade) {
         return levelDao.findLevelByGrade(grade);
     }
-    public Level findLevelByLNo(String lNo) {
+
+    public Level findLevelByLNo(int lNo) {
         return levelDao.findLevelByLNo(lNo);
 
     }

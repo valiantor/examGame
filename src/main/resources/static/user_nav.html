@@ -9,16 +9,17 @@
                 type: "get",
                 dataType: "text",
                 success: function (result) {
-
+                    //alert(result);
                     if(result == "" || null == result) {
 
-                        window.location="admin_login.html";
+                        window.location="user_login.html";
                         $("#admin_info").text("未登录");
                     }else{
 
                         currentUser = $.parseJSON(result);
-                        $("#admin_info").text(currentUser.name+" 已登陆");
-                        $("#admin_login").addClass("invisible");
+                        $("#user_name").text(currentUser.name+" 已登陆");
+                        $("#user_login").addClass("invisible");
+                        $("#user_experience").text("经验值："+currentUser.experience);
                     }
                 } ,
                 error: function (e) {
@@ -37,10 +38,10 @@
 <div class="top-bar" id="example-menu">
     <div class="top-bar-left">
         <ul class="dropdown menu" data-dropdown-menu>
-            <li class="menu-text">关卡</li>
-            <li class="invisible" id="admin_login"><a href="admin_login.html">登陆</a></li>
-            <li><span id="admin_info"></span> </li>
-
+            <li class="menu-text">答题闯关</li>
+            <li id="user_login"><a href="admin_login.html">登陆</a></li>
+            <li><span id="user_name"></span> </li>
+            <li><span id="user_experience"></span> </li>
         </ul>
     </div>
     <div class="top-bar-right">

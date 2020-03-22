@@ -6,7 +6,7 @@ public class UserQuestion {
     private String correctness;
     private String date;
     private String uId;
-    private int lNo;
+    private int qNo;
 
     public int getuQNo() {
         return uQNo;
@@ -40,12 +40,12 @@ public class UserQuestion {
         this.uId = uId;
     }
 
-    public int getlNo() {
-        return lNo;
+    public int getqNo() {
+        return qNo;
     }
 
-    public void setlNo(int lNo) {
-        this.lNo = lNo;
+    public void setqNo(int qNo) {
+        this.qNo = qNo;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class UserQuestion {
                 ", correctness='" + correctness + '\'' +
                 ", date='" + date + '\'' +
                 ", uId='" + uId + '\'' +
-                ", lNo=" + lNo +
+                ", qNo=" + qNo +
                 '}';
     }
 }

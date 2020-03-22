@@ -22,9 +22,14 @@
 
     <insert id="addUser" parameterType="com.valiantor.entity.User">
         insert into user(u_id,name,password,experience,profile,current_level_no)
-        values (#{user.uId}#{user.name},#{user.password},#{user.experience},#{user.profile},#{user.currentLevelNo})
+        values (#{user.uId},#{user.name},#{user.password},#{user.experience},#{user.profile},#{user.currentLevelNo})
     </insert>
 
+    <update id="updateUser" parameterType="com.valiantor.entity.User">
+        update user
+        set name = #{user.name}, password = #{user.password}, experience = #{user.experience}, profile = #{user.profile}, current_level_no = #{user.currentLevelNo}
+        where u_id = #{user.uId}
+    </update>
 
     <!-- purchase(p_no, title, content, type, publish_date, end_date, c_no, s_id)
             goods(g_no, name, price, participator_path, p_no)

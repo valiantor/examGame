@@ -10,6 +10,18 @@
             <result column="password" property="password"/>
         </resultMap>-->
 
+    <insert id="addQuestion" parameterType="com.valiantor.entity.Question">
+        insert into question(question_description,test_point,choice_a,choice_b,choice_c,choice_d,choice_e,correct_option,answer_analysis,experience_value,l_no)
+        values (#{question.questionDescription},#{question.testPoint},#{question.choiceA},#{question.choiceB},#{question.choiceC},#{question.choiceD},#{question.choiceE},#{question.correctOption},#{question.answerAnalysis},#{question.experienceValue},#{question.lNo})
+    </insert>
+
+    <select id="findQuestionByQNoList" resultType="com.valiantor.entity.Question" parameterType="java.util.List">
+        select * from question
+        where q_no in
+        <foreach collection="qNoList" index="index" item="qNo" separator="," open="(" close=")">
+            #{qNo}
+        </foreach>
+    </select>
     <select id="findAllQuestionBylNo" resultType="com.valiantor.entity.Question">
         select * from question
         where l_no = #{lNo}

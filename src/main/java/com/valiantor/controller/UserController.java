@@ -86,7 +86,7 @@ public class UserController {
     @RequestMapping("checkUserId")
     public boolean checkUserId(String uId){
     User user = userService.findUserByUId(uId);
-    return user==null?false:true;
+    return user==null?true:false;
     }
 
 

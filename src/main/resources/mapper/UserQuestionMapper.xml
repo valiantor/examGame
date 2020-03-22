@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<!-- namespace映射文件的namespace必须等于Mapper映射器的全限定名 -->
+<mapper namespace="com.valiantor.dao.UserQuestionDao">
+
+<!--    <resultMap type="com.valiantor.entity.Admin" id="adminMap">
+        <result column="a_id" property="aId"/>
+        <result column="password" property="password"/>
+    </resultMap>-->
+
+	<insert id="addUserQuestionList" parameterType="java.util.List">
+		insert into user_question(correctness,date,u_id,q_no)
+		values
+		<foreach collection="userQuestionList" index="index" item="userQuestion" separator="," close=";">
+			(#{userQuestion.correctness},#{userQuestion.date},#{userQuestion.uId},#{userQuestion.qNo})
+		</foreach>
+
+	</insert>
+
+
+
+    <select id="findUserQuestionByUId" resultType="com.valiantor.entity.UserQuestion" parameterType="String">
+		select * from user_question
+		where u_id = #{uId}
+	</select>
+
+
+    <!-- purchase(p_no, title, content, type, publish_date, end_date, c_no, s_id)
+            goods(g_no, name, price, participator_path, p_no)
+    -->
+   <!-- <insert id="publishPurchase" parameterType="kui.cams.entity.Purchase" useGeneratedKeys="true" keyProperty="p_no">
+		insert into purchase(title, content, type, publish_date,end_date,c_no, s_id)
+		values(#{title},#{content},#{type},#{publish_date},#{end_date},#{c_no},#{s_id})
+	</insert>
+
+    <delete id="deletePurchaseByP_no" parameterType="int">
+		delete from purchase
+		where p_no = #{p_no}
+	</delete>
+
+
+    <select id="findPurchaseByC_no" resultType="kui.cams.entity.Purchase" parameterType="String">
+		select * from purchase
+		where c_no = #{c_no}
+		order by p_no desc
+	</select>
+
+    <select id="findInPurchaseByC_no" resultType="kui.cams.entity.Purchase" parameterType="String">
+		select * from purchase
+		where c_no = #{c_no}
+		and end_date > now()
+		order by publish_date desc
+	</select>
+
+    <select id="findPurchaseByP_no" resultType="kui.cams.entity.Purchase" parameterType="int">
+		select * from purchase
+		where p_no = #{p_no}
+	</select>
+
+    <select id="findPurchaseByS_id" resultType="kui.cams.entity.Purchase" parameterType="String">
+
+		select * from purchase
+		where s_id = #{s_id}
+		order by p_no desc
+	</select>
+-->
+
+
+
+</mapper>

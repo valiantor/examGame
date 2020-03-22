@@ -17,6 +17,7 @@
     <script>
         var currentUser;
         var currentLevel;
+        var currentQuestionList;
         var lastLevel;
         $(document).ready(function() {
             findAllLevel();
@@ -55,7 +56,7 @@
                 $(div2).addClass("grid-padding-x content_center").css({"box-shadow": "10px 10px 5px #888888","width":"150px","border-radius": "5px"});
                 var div3_1 = document.createElement("div");
 
-                if(currentUser.lNo >= level.lNo){
+                if(currentUser.currentLevelNo >= level.lNo){
                     $(div3_1).addClass("large-12 medium-12 ").css({"overflow":"hidden","background-color":"#3adb76", "height":"100px"});
                 }else{
                     $(div3_1).addClass("large-12 medium-12 ").css({"overflow":"hidden","background-color":"#cacaca", "height":"100px"});
@@ -71,7 +72,9 @@
                 div2.append(div3_2);
                 div1.append(div2);
 
-                $(div2).click({"level":level},showLevelInfo);
+                if(currentUser.currentLevelNo >= level.lNo){
+                    $(div2).click({"level":level},showLevelInfo);
+                }
                 $("#content").append(div1);
 
             }
@@ -99,15 +102,15 @@
             $("#level_info").show();
             $("html").addClass("unfoces");
             $("body").addClass("unfoces");
-            $("#add_question").addClass("unfoces");
-            $("#add_level").addClass("unfoces");
+            $("#answer_question").addClass("unfoces");
+
             $("#level_title").text("关卡"+currentLevel.grade);
             $("#level_grade").text(currentLevel.grade);
             $("#level_description").text(currentLevel.description);
             $("#level_experience_need").text(currentLevel.experienceNeed);
             $("#level_rate").text(currentLevel.rate+"%");
 
-            $("#start_answer_button").click({"lNo":lNo},showStartAnswer);
+            $("#start_answer_button").click({"lNo":currentLevel.lNo},showStartAnswer);
           //  findCurrentRankInfo(currentLevel.lNo);
 
         }
@@ -118,14 +121,26 @@
          */
         function showStartAnswer(d){
             var lNo = d.data.lNo;
-            var num = 5;
+            var num = 3;
             $.ajax({
                 url: "/question/findRandomQuestionByLNoAndNum",
                 dataType: "text",
-                data: "lNo="+u_id+"&num="+num,
+                data: "lNo="+lNo+"&num="+num,
                 success: function (result) {
-                    var questionList = $.parseJSON(result);
-                    loadQuestions(levelList);
+                    if(result != ""){
+                        var questionList = $.parseJSON(result);
+                        var maxw = document.documentElement.clientWidth;
+                        var maxh = document.documentElement.clientHeight;
+                        $("#answer_question").css({"z-index":"91","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+                        $("#answer_question").show();
+                        $("html").addClass("unfoces");
+                        $("body").addClass("unfoces");
+                        $("#level_info").addClass("unfoces");
+
+                        loadQuestions(questionList);
+                    }
+
+
                 },
                 error: function (e) {
                     alert("错误")
@@ -135,40 +150,155 @@
 
         function loadQuestions(questionList){
 
-            var tbody = $("#question_list tbody");
-            $(tbody).empty();
-            for(var i = 0;i<questionList.length;i++) {
+            currentQuestionList = questionList;
+            var div_question_info=$("#question_info");
+            $(div_question_info).empty();
+            for(var i = 0;i<questionList.length;i++){
                 var question = questionList[i];
-                var tr = document.createElement("tr");
-                var td_description = document.createElement("td");
-                var td_test_point = document.createElement("td");
-                var td_experience_value = document.createElement("td");
 
-                var td_operation = document.createElement("td");
-                var a_showInfo = document.createElement("a");
-                $(a_showInfo).text("查看 ")
-                var a_edit = document.createElement("a");
-                $(a_edit).text("编辑 ")
-                var a_delete = document.createElement("a");
-                $(a_delete).text("删除 ")
-                $(a_delete).click({"qNo":question.qNo},deleteQuestionFromLevel);
-                $(td_operation).append(a_showInfo, a_edit, a_delete);
+                var table = document.createElement("table");
+                var tr_title = document.createElement("tr");
+                var td_title = document.createElement("td");
+                $(td_title).text(question.questionDescription);
+                $(tr_title).append(td_title)
+                $(table).append(tr_title);
+                if(question.choiceA != "" || question.choiceA != null){
+                    var tr_a = document.createElement("tr");
+                    var td_a = document.createElement("td");
+                    var label = document.createElement("label");
+                    var input = document.createElement("input");
+                    $(input).val("A");
+                    input.type="radio";
+                    input.name=question.qNo;
+                    $(label).append(input,"A:"+question.choiceA);
+                    $(td_a).append(label);
+                    $(tr_a).append(td_a);
+                    $(table).append(tr_a);
+                }
+                if(question.choiceB != ""  && question.choiceB != null){
+                    var tr_b = document.createElement("tr");
+                    var td_b = document.createElement("td");
+                    var label = document.createElement("label");
+                    var input = document.createElement("input");
+                    $(input).val("B");
+                    input.type="radio";
+                    input.name=question.qNo;
+                    $(label).append(input,"B:"+question.choiceB);
+                    $(td_b).append(label);
+                    $(tr_b).append(td_b);
+                    $(table).append(tr_b);
+                }
+                if(question.choiceC != "" && question.choiceC != null){
+                    var tr_c = document.createElement("tr");
+                    var td_c = document.createElement("td");
+                    var label = document.createElement("label");
+                    var input = document.createElement("input");
+                    $(input).val("C");
+                    input.type="radio";
+                    input.name=question.qNo;
+                    $(label).append(input,"C:"+question.choiceC);
+                    $(td_c).append(label);
+                    $(tr_c).append(td_c);
+                    $(table).append(tr_c);
+                }
+                if(question.choiceD != "" && question.choiceD != null){
+                    var tr_d = document.createElement("tr");
+                    var td_d = document.createElement("td");
+                    var label = document.createElement("label");
+                    var input = document.createElement("input");
+                    $(input).val("D");
+                    input.type="radio";
+                    input.name=question.qNo;
+                    $(label).append(input,"D:"+question.choiceD);
+                    $(td_d).append(label);
+                    $(tr_d).append(td_d);
+                    $(table).append(tr_d);
+                }
+                if(question.choiceE != "" && question.choiceE != null){
+                    var tr_e = document.createElement("tr");
+                    var td_e = document.createElement("td");
+                    var label = document.createElement("label");
+                    var input = document.createElement("input");
+                    $(input).val("E");
+                    input.type="radio";
+                    input.name=question.qNo;
+                    $(label).append(input,"E:"+question.choiceE);
+                    $(td_e).append(label);
+                    $(tr_e).append(td_e);
+                    $(table).append(tr_e);
+                }
+               $(div_question_info).append(table);
 
-                $(tr).append(td_description, td_test_point, td_experience_value, td_operation);
-
-                $(td_description).text(question.questionDescription)
-                $(td_test_point).text(question.testPoint)
-                $(td_experience_value).text(question.experienceValue)
-
-                $(tbody).append(tr)
             }
 
         }
 
+        function doAnswer(){
+
+            var answerArr = new Array();
 
 
+            var tables = $("#question_info table");
+           // alert(tables.length)
+            for(var i = 0;i<tables.length;i++){
+                var table = tables[i];
+                var inputs = $(table).find("input");
+
+                //alert(inputs.length)
+                var answerQuestion = new Object();
+                for(var j = 0;j<inputs.length;j++){
+                    var input = inputs[j];
+                    //alert(input.value+","+input.checked+","+input.name);
+                    if(input.checked) {
+                        answerQuestion.qNo = input.name;
+                        answerQuestion.uId = currentUser.uId;
+                        answerQuestion.choice = input.value;
+                        answerArr.push(answerQuestion);
+                        break;
+                    }
+                }
+            }
 
 
+            $.ajax({
+                url: "/question/answerQuestion",
+                dataType: "text",
+                type: "post",
+                data: "answerQuestion="+JSON.stringify(answerArr),
+                success: function (result) {
+                    if(result == "true"){
+                        $("#answer_message").text("闯关成功,2秒后关闭").css({color:"red"});
+
+                    }else{
+                        $("#answer_message").text("闯关失败,2秒后关闭").css({color:"red"});
+                    }
+                    setTimeout(closeAnswerQuestionPanel,2000);
+                },
+                error: function (e) {
+                    alert("错误")
+                }
+            });
+        }
+
+
+        function closeAnswerQuestionPanel(){
+            $('#answer_question').fadeOut(500);
+            $("html").removeClass("unfoces");
+            $("body").removeClass("unfoces");
+            $("#level_info").removeClass("unfoces");
+            $("#question_info").empty();
+            $("#answer_message").text("");
+        }
+        function closeLevelInfoPanel(){
+            $('#level_info').fadeOut(500);
+            $("html").removeClass("unfoces");
+            $("body").removeClass("unfoces");
+            $("#answer_question").removeClass("unfoces");
+        }
+
+        function sleep(delay) {
+            for(var t = Date.now(); Date.now() - t <= delay;);
+        }
 
     </script>
 
@@ -188,9 +318,7 @@
 </div>
 
 <div class="grid-container  fluid margin_top" >
-    <div class="cell text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
-        <button class="button dark"  id="add_level_button" onclick="showAddLevel()">添加关卡</button>
-    </div>
+
 
     <div id="content" class="grid-x grid-margin-x grid-margin-y">
         <!--div1-->
@@ -207,14 +335,6 @@
                 </div>
             </div>
         </div>
-
-
-
-
-
-
-
-
     </div>
 </div>
 
@@ -246,6 +366,7 @@
                 </tr>
                 </tbody>
             </table>
+
         </div>
        <!-- <div class="cell small-12 medium-8" id="question_list">
             <div>
@@ -270,6 +391,73 @@
     <hr/>
 
 </div>
+
+
+
+
+
+<div  id="answer_question" style="position: fixed; display: none;  padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
+    <div class="text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
+        <button onclick="closeAnswerQuestionPanel()" class="button success">取消</button>
+    </div>
+
+    <h3 id="answer_question_title" style="font-weight: bold"></h3>
+    <div class="grid-padding-x">
+        <div class="cell small-12" id="question_info">
+            <table>
+                <tbody>
+                <tr>
+                    <td>宏定义的宏展开是在(    )阶段完成的。</td>
+                </tr>
+                <tr></tr>
+                <tr>
+                    <td><label> <input name="answer"  type="radio" value="A">A:预处理</label></td>
+                </tr>
+                <tr>
+                    <td><label> <input name="answer"  type="radio" value="B">B:预处理</label></td>
+                </tr>
+                <tr>
+                   <td> <label><input name="answer"  type="radio" value="C">C:预处理</label></td>
+                </tr>
+                <tr>
+                    <td><label> <input name="answer"  type="radio" value="D">D:预处理</label></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <table>
+                <tbody>
+                <tr>
+                    <td>宏定义的宏展开是在(    )阶段完成的。</td>
+                </tr>
+                <tr></tr>
+                <tr>
+                    <td><label> <input name="answer2"  type="radio" value="A">A:预处理</label></td>
+                </tr>
+                <tr>
+                    <td><label> <input name="answer2"  type="radio" value="B">B:预处理</label></td>
+                </tr>
+                <tr>
+                    <td> <label><input name="answer2"  type="radio" value="C">C:预处理</label></td>
+                </tr>
+                <tr>
+                    <td><label> <input name="answer2"  type="radio" value="D">D:预处理</label></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="cell">
+            <input type="button" onclick="doAnswer()" class="button" value="提交" /><span id="answer_message"></span>
+        </div>
+
+    </div>
+
+</div>
+<hr/>
+
+</div>
+
 
 </body>
 </html>

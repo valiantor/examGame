@@ -138,16 +138,16 @@
 
 
 
-            var question_description = $("#question_description").val();
-            var test_point = $("#test_point").val();
-            var choice_a = $("#choice_a").val();
-            var choice_b = $("#choice_b").val();
-            var choice_c = $("#choice_c").val();
-            var choice_d = $("#choice_d").val();
-            var choice_e = $("#choice_e").val();
-            var correct_option = $("#correct_option").val();
-            var answer_analysis = $("#answer_analysis").val();
-            var experience_value = $("#experience_value").val();
+            var question_description = $("#question_description").val().trim();
+            var test_point = $("#test_point").val().trim();
+            var choice_a = $("#choice_a").val().trim();
+            var choice_b = $("#choice_b").val().trim();
+            var choice_c = $("#choice_c").val().trim();
+            var choice_d = $("#choice_d").val().trim();
+            var choice_e = $("#choice_e").val().trim();
+            var correct_option = $("#correct_option").val().trim();
+            var answer_analysis = $("#answer_analysis").val().trim();
+            var experience_value = $("#experience_value").val().trim();
             var lNo = currentLevel.lNo;
 
             if(question_description == "" || choice_a == "" || choice_b == "" || correct_option == "" || experience_value == ""){
@@ -199,9 +199,10 @@
             $.ajax({
                 url: "/question/addQuestion",
                 dataType: "text",
+                type: "post",
                 data: {"question":questionJson},
                 success: function (result) {
-                    if(result == true){
+                    if(result == "true"){
                         closeAddQuestionPanel();
                         //刷新关卡详情页
                         findAllQuestionByLNo(currentLevel.lNo);
