@@ -22,7 +22,12 @@ public class LevelService {
         return row > 0;
     }
 
-    public Level findLevelByGrade(int grade){
+
+    public Level findLevelByGrade(int grade) {
         return levelDao.findLevelByGrade(grade);
+    }
+    public Level findLevelByLNo(String lNo) {
+        return levelDao.findLevelByLNo(lNo);
+
     }
 }

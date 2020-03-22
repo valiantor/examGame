@@ -10,6 +10,11 @@
         <result column="password" property="password"/>
     </resultMap>-->
 
+	<select id="findLevelByLNo" resultType="com.valiantor.entity.Level">
+		select * from level where l_no=#{lNo}
+	</select>
+
+
     <select id="findAllLevel" resultType="com.valiantor.entity.Level">
 		select * from level
 	</select>

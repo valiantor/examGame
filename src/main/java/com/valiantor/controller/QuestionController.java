@@ -21,7 +21,6 @@ public class QuestionController {
      */
     @RequestMapping("findAllQuestionByLNo")
     public List<Question> findAllQuestionByLNo(@RequestParam("lNo") int lNo){
-
         return questionService.findAllQuestionBylNo(lNo);
     }
 
