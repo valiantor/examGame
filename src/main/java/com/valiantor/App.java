@@ -18,4 +18,9 @@ public class App {
     public String index(){
         return "redirect:main.html";
     }
+
+    @RequestMapping("/admin")
+    public String admin(){
+        return "redirect:admin_main.html";
+    }
 }

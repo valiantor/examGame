@@ -15,64 +15,11 @@
     </script>
 
     <script>
-        function addLevel(){
-
-            var grade = $("#grade").val();
-            var experience_need = $("#experience_need").val();
-            var description = $("#description").val();
-            var rate = $("#rate").val();
-
-            if(grade=="" || experience_need == "" || description == "" || rate == ""){
-                $("#message").text("请输入完整").css({color:"red"});
-                return false;
-            }
-            var level = new Object();
-            level.grade = grade;
-            level.experienceNeed = experience_need;
-            level.description = description;
-            level.rate = description;
-
-            var levelStr = JSON.stringify(level);
-
-            $.ajax({
-                url: "/level/addLevel",
-                dataType: "text",
-                data: {"level":levelStr},
-                success: function (result) {
-                   if(result == true){
-                       alert("添加成功");
-                   }
-
-                },
-                error: function (e) {
-                    alert("错误")
-                }
-
-            });
-
-
-        }
 
     </script>
 </head>
 <body>
-<div class="content_center grid-container">
-    <h1>添加关卡</h1>
-    <label for="grade">关卡等级
-        <input type="text" placeholder="grade" id="grade" >
-    </label>
-    <label for="experience_need">所需经验
-        <input type="text" placeholder="解锁关卡所需要的经验值" id="experience_need">
-    </label>
-    <label for="description">描述
-        <input type="text" placeholder="关卡描述" id="description">
-    </label>
-    <label for="rate">通关率
-        <input type="text" placeholder="答对当前关卡百分比的题时通过当前关卡" id="rate">
-    </label>
-    <button onclick="addLevel()" class="button success">添加</button><span id="message"></span>
 
-</div>
 
 </body>
 </html>

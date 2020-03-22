@@ -16,6 +16,7 @@
 
     <script>
         var currentLevel;
+        var lastLevel;
         $(document).ready(function() {
             findAllLevel();
         });
@@ -37,6 +38,8 @@
             $("#content").empty();
             for(var i = 0;i<levelList.length;i++){
                 var level = levelList[i];
+                lastLevel = level;
+
                 var grade = level.grade;
                 var experienceNeed = level.experienceNeed;
                 var description = level.description;
@@ -66,13 +69,6 @@
             }
         }
 
-        function showLevelInfo(d){
-
-            currentLevel = d.data.level;
-
-            findAllQuestionByLNo(currentLevel.lNo);
-
-        }
 
 
         function addLevel(){
@@ -83,14 +79,22 @@
             var rate = $("#rate").val();
 
             if(grade=="" || experience_need == "" || description == "" || rate == ""){
-                $("#message").text("请输入完整").css({color:"red"});
+                $("#level_message").text("请输入完整").css({color:"red"});
+                return false;
+            }
+            if(experience_need <= lastLevel.experienceNeed){
+                $("#level_message").text("所需经验应大于"+lastLevel.experienceNeed).css({color:"red"});
+                return false;
+            }
+            if(rate <= 0 || rate > 100){
+                $("#level_message").text("通过率应在0到100之间").css({color:"red"});
                 return false;
             }
             var level = new Object();
             level.grade = grade;
             level.experienceNeed = experience_need;
             level.description = description;
-            level.rate = description;
+            level.rate = rate;
 
             var levelStr = JSON.stringify(level);
 
@@ -100,8 +104,10 @@
                 type: "post",
                 data: {"level":levelStr},
                 success: function (result) {
-                    if(result == true){
-                        alert("添加成功");
+                    if(result == "true"){
+                        //关闭当前
+                        closeAddLevelPanel();
+                        findAllLevel();
                     }
                 },
                 error: function (e) {
@@ -109,6 +115,11 @@
                 }
             });
         }
+
+
+
+
+
         function addQuestion(){
 
             var question_description = $("#question_description").val();
@@ -127,6 +138,7 @@
                 $("#question_message").text("请输入完整").css({color:"red"});
                 return false;
             }
+
 
             var question = new Object();
             question.questionDescription = question_description;
@@ -174,11 +186,12 @@
                     $("html").addClass("unfoces");
                     $("body").addClass("unfoces");
                     $("#add_question").addClass("unfoces");
+                    $("#add_level").addClass("unfoces");
                     $("#level_title").text("关卡"+currentLevel.grade);
                     $("#level_grade").text(currentLevel.grade);
                     $("#level_description").text(currentLevel.description);
                     $("#level_experience_need").text(currentLevel.experienceNeed);
-                    $("#level_rate").text(currentLevel.rate);
+                    $("#level_rate").text(currentLevel.rate+"%");
 
                     $("#add_question_button").click({"lNo":lNo},showAddQuestion);
                     if(result != ""){
@@ -191,6 +204,24 @@
             });
         }
 
+        function showAddLevel(){
+
+            var maxw = document.documentElement.clientWidth;
+            var maxh = document.documentElement.clientHeight;
+            $("#add_level").css({"z-index":"90","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+            $("#add_level").show();
+            $("html").addClass("unfoces");
+            $("body").addClass("unfoces");
+            $("#level_info").addClass("unfoces");
+            $("#add_question").addClass("unfoces");
+
+            $("#grade").val(lastLevel.grade+1);
+            $("#experience_need").attr("placeholder","应大于"+lastLevel.experienceNeed);
+            //closeLevelInfoPanel();
+
+        }
+
+
         function showAddQuestion(d){
 
             var lNo = d.data.lNo;
@@ -201,9 +232,17 @@
             $("html").addClass("unfoces");
             $("body").addClass("unfoces");
             $("#level_info").addClass("unfoces");
+            $("#add_level").addClass("unfoces");
 
             $("#lNo").val(lNo);
 
+
+        }
+        function showLevelInfo(d){
+
+            currentLevel = d.data.level;
+
+            findAllQuestionByLNo(currentLevel.lNo);
 
         }
 
@@ -232,16 +271,26 @@
 
         }
 
-
+        function closeAddLevelPanel(){
+            $('#add_level').fadeOut(500);
+            $("html").removeClass("unfoces");
+            $("body").removeClass("unfoces");
+            $("#add_question").removeClass("unfoces");
+            $("#level_info").removeClass("unfoces");
+        }
         function closeLevelInfoPanel(){
             $('#level_info').fadeOut(500);
             $("html").removeClass("unfoces");
             $("body").removeClass("unfoces");
+            $("#add_question").removeClass("unfoces");
+            $("#add_level").removeClass("unfoces");
         }
         function closeAddQuestionPanel(){
             $('#add_question').fadeOut(500);
             $("html").removeClass("unfoces");
             $("body").removeClass("unfoces");
+            $("#add_level").removeClass("unfoces");
+            $("#level_info").removeClass("unfoces");
         }
 
     </script>
@@ -262,6 +311,10 @@
 </div>
 
 <div class="grid-container  fluid margin_top" >
+    <div class="cell text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
+        <button class="button dark"  id="add_level_button" onclick="showAddLevel()">添加关卡</button>
+    </div>
+
     <div id="content" class="grid-x grid-margin-x grid-margin-y">
         <!--div1-->
         <div class="cell small-12 medium-4 large-3 padding_vertical" >
@@ -312,7 +365,7 @@
                         <td>所需经验:</td><td id="level_experience_need"></td>
                     </tr>
                     <tr>
-                        <td>通关率:</td><td id="level_rate"></td>
+                        <td>通关率(单位：%):</td><td id="level_rate"></td>
                     </tr>
                 </tbody>
             </table>
@@ -339,12 +392,31 @@
     </div>
     <hr/>
 
-
-
-
-
-
 </div>
+
+<div id="add_level"  style="position: fixed; display: none; padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
+    <div class="content_center grid-container" >
+        <div class="text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
+            <button onclick="closeAddLevelPanel()" class="button success">关闭</button>
+        </div>
+        <h1>添加关卡</h1>
+        <label for="grade">关卡等级
+            <input type="text" placeholder="grade" readonly id="grade" >
+        </label>
+        <label for="experience_need">所需经验
+            <input type="text" placeholder="解锁关卡所需要的经验值" id="experience_need">
+        </label>
+        <label for="description">描述
+            <input type="text" placeholder="关卡描述" id="description">
+        </label>
+        <label for="rate">通关率
+            <input type="text" placeholder="通关率应在0到100之间" id="rate">
+        </label>
+        <button onclick="addLevel()" class="button success">添加</button><span id="level_message"></span>
+    </div>
+</div>
+
+
 
 
 
