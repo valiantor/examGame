@@ -36,4 +36,16 @@ public class QuestionController {
 
         return null;
     }
+
+    /**
+     * 添加一条题
+     * @param questionJson 题对象的json字符串
+     * @return
+     */
+
+    public boolean addQuestion(@RequestParam("questionJson") String questionJson){
+
+
+        return false;
+    }
 }
