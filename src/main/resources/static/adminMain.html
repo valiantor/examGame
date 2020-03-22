@@ -149,7 +149,9 @@
                 data: {"question":questionJson},
                 success: function (result) {
                     if(result == true){
-                        alert("添加成功");
+                        closeAddQuestionPanel();
+                        //刷新关卡详情页
+                        findAllQuestionByLNo(currentLevel.lNo);
                     }
                 },
                 error: function (e) {

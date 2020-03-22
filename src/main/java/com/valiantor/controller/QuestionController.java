@@ -1,5 +1,6 @@
 package com.valiantor.controller;
 
+import com.google.gson.Gson;
 import com.valiantor.entity.Question;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,6 +12,9 @@ import java.util.List;
 @RequestMapping("question")
 public class QuestionController {
 
+    
+    private Gson gson = new Gson();
+    
     /**
      * 根据关卡号查询当前关卡下的所有题
      * @param lNo 关卡号
@@ -44,7 +48,7 @@ public class QuestionController {
      */
 
     public boolean addQuestion(@RequestParam("question") String questionJson){
-
+        Question question = gson.fromJson(questionJson, Question.class);
 
         return false;
     }
