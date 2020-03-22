@@ -20,6 +20,12 @@
 
 	</insert>
 
+	<select id="findLevelByGrade" resultType="com.valiantor.entity.Level">
+		select  * from level
+		where grade= #{grade}
+	</select>
+
+
 
     <!-- purchase(p_no, title, content, type, publish_date, end_date, c_no, s_id)
             goods(g_no, name, price, participator_path, p_no)
