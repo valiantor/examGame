@@ -90,4 +90,19 @@ public class UserController {
     }
 
 
+    /**
+     * 为当前用户增加经验
+     * @param acquireExperience
+     * @return
+     */
+    @RequestMapping("updateUserExperience")
+    public boolean updateUserExperience(@RequestParam("acquireExperience") int acquireExperience,HttpSession session){
+
+        Object uIdObj = session.getAttribute("uId");
+        if(uIdObj==null) return false;
+
+        if(acquireExperience == 0) return false;
+        return userService.updateUserExperience(acquireExperience,String.valueOf(uIdObj));
+    }
+
 }

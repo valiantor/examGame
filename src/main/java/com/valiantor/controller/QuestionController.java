@@ -69,8 +69,8 @@ public class QuestionController {
     }
 
 
-    @RequestMapping("answerQuestion")
-    public boolean answerQuestion(@RequestParam("answerQuestion") String answerQuestion){
+    @RequestMapping("answerQuestionList")
+    public boolean answerQuestionList(@RequestParam("answerQuestionList") String answerQuestion){
 
         List<AnswerQuestion> answerQuestionList= new Gson().fromJson(answerQuestion, new TypeToken<List<AnswerQuestion>>() {
         }.getType());
@@ -78,7 +78,18 @@ public class QuestionController {
         if(CollectionUtils.isEmpty(answerQuestionList)) return false;
 
 
-        return questionService.answerQuestion(answerQuestionList);
+        return questionService.answerQuestionList(answerQuestionList);
+    }
+
+    @RequestMapping("answerQuestion")
+    public boolean answerQuestion(@RequestParam("answerQuestion") String answerQuestionJson){
+
+        AnswerQuestion answerQuestion = new Gson().fromJson(answerQuestionJson, AnswerQuestion.class);
+
+        if(answerQuestion == null) return false;
+
+
+        return questionService.answerQuestion(answerQuestion);
     }
 
 

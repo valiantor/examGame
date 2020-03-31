@@ -85,7 +85,7 @@ public class QuestionService {
         return questionList;
     }
 
-    public boolean answerQuestion(List<AnswerQuestion> answerQuestionList) {
+    public boolean answerQuestionList(List<AnswerQuestion> answerQuestionList) {
         List<Integer> qNoList = new ArrayList<>();
         Map<Integer,AnswerQuestion> answerQuestionMap = new HashMap<>();
         String uId = answerQuestionList.get(0).getuId();
@@ -144,5 +144,26 @@ public class QuestionService {
 
     public boolean addQuestion(Question question) {
        return questionDao.addQuestion(question) > 0;
+    }
+
+    public boolean answerQuestion(AnswerQuestion answerQuestion) {
+
+        Question question = questionDao.findQuestionByQNo(answerQuestion.getqNo());
+
+        if(question == null) return false;
+
+        UserQuestion userQuestion = new UserQuestion();
+        userQuestion.setqNo(question.getqNo());
+        userQuestion.setuId(answerQuestion.getuId());
+        userQuestion.setCorrectness("N");
+        userQuestion.setDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        if(question.getCorrectOption().equals(answerQuestion.getChoice())){
+            userQuestion.setCorrectness("Y");
+        }
+        List<UserQuestion> userQuestionList = new ArrayList<>();
+        userQuestionList.add(userQuestion);
+
+        userQuestionDao.addUserQuestionList(userQuestionList);
+        return "Y".equals(userQuestion.getCorrectness());
     }
 }

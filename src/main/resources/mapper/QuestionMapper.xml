@@ -22,6 +22,10 @@
             #{qNo}
         </foreach>
     </select>
+    <select id="findQuestionByQNo" resultType="com.valiantor.entity.Question" parameterType="int">
+        select * from question
+        where q_no = #{qNo}
+    </select>
     <select id="findAllQuestionBylNo" resultType="com.valiantor.entity.Question">
         select * from question
         where l_no = #{lNo}

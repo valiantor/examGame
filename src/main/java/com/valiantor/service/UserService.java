@@ -23,4 +23,11 @@ public class UserService {
         return raw>0;
     }
 
+    public boolean updateUserExperience(int acquireExperience,String uId) {
+        User user = userDao.findUserByUId(uId);
+        user.setExperience(user.getExperience()+acquireExperience);
+
+       return userDao.updateUser(user) > 0;
+
+    }
 }

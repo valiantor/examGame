@@ -15,10 +15,15 @@
     </script>
 
     <script>
-        var currentUser;
-        var currentLevel;
-        var currentQuestionList;
-        var lastLevel;
+        var currentUser;//当前用户信息
+        var currentLevel;//当前关卡信息
+        var currentQuestionList;//当前问题列表
+        var lastLevel;//最后一个关卡(用户所处关卡)
+
+        var currentQuestion;//当前问题
+        var currentTime;//当前翻牌次数
+        var currentScore = 0;//当前答题获取的分数
+        var needScore ;
         $(document).ready(function() {
             findAllLevel();
         });
@@ -74,6 +79,8 @@
 
                 if(currentUser.currentLevelNo >= level.lNo){
                     $(div2).click({"level":level},showLevelInfo);
+                }else{
+                    $(span).text("关卡"+grade+"(所需经验:"+level.experienceNeed+")");
                 }
                 $("#content").append(div1);
 
@@ -120,12 +127,22 @@
          * @param d
          */
         function showStartAnswer(d){
+
+
+            var grade = currentLevel.grade;
+
+            var row = Math.floor(grade/2 +3);//矩阵行数
+            var col = Math.floor((grade-1)/2 + 3);//矩阵列数
+            var q = Math.floor((row*col+1)/2);//问题数量
+            var t = Math.floor((q+row*col)/2);//翻牌次数
+
+
             var lNo = d.data.lNo;
             var num = 3;
             $.ajax({
                 url: "/question/findRandomQuestionByLNoAndNum",
                 dataType: "text",
-                data: "lNo="+lNo+"&num="+num,
+                data: "lNo="+lNo+"&num="+q,
                 success: function (result) {
                     if(result != ""){
                         var questionList = $.parseJSON(result);
@@ -137,10 +154,8 @@
                         $("body").addClass("unfoces");
                         $("#level_info").addClass("unfoces");
 
-                        loadQuestions(questionList);
+                        loadQuestionMatrix(questionList);
                     }
-
-
                 },
                 error: function (e) {
                     alert("错误")
@@ -148,146 +163,292 @@
             });
         }
 
-        function loadQuestions(questionList){
-
+        /**
+         * 列出问题矩阵
+         * @param questionList
+         */
+        function loadQuestionMatrix(questionList){
             currentQuestionList = questionList;
-            var div_question_info=$("#question_info");
-            $(div_question_info).empty();
+            var div_question_matrix=$("#question_matrix");
+            $(div_question_matrix).empty();
+            var grade = currentLevel.grade;
+
+            var allScore = 0;
+
+
+            var row = Math.floor(grade/2 +3);//矩阵行数
+            var col = Math.floor((grade-1)/2 + 3);//矩阵列数
+            var s = row*col;
+            var q = Math.floor((s+1)/2);//问题数量
+            var t = Math.floor((q+s)/2);//翻牌次数
+            currentTime = t;
+
+            var maxw = $(div_question_matrix).width();//获取div的最大宽度
+         //   alert("row:"+row+",col:"+col+",q:"+q+",t:"+t+",maxw:"+maxw);
+
+            var sqw = maxw/row;//每个小方格边长
+            sqw = (maxw - sqw/4)/row;
+            $(div_question_matrix).css({"height":(sqw*row)+"px"});
+
+            //将q个题目随机添加到row * col个小方格中。
+
+            var questionArray = new Array();//row*col个小方格转化为一维数组，其中将q个问题随机放到这个一维数组中
+
+
+
             for(var i = 0;i<questionList.length;i++){
                 var question = questionList[i];
-
-                var table = document.createElement("table");
-                var tr_title = document.createElement("tr");
-                var td_title = document.createElement("td");
-                $(td_title).text(question.questionDescription);
-                $(tr_title).append(td_title)
-                $(table).append(tr_title);
-                if(question.choiceA != "" || question.choiceA != null){
-                    var tr_a = document.createElement("tr");
-                    var td_a = document.createElement("td");
-                    var label = document.createElement("label");
-                    var input = document.createElement("input");
-                    $(input).val("A");
-                    input.type="radio";
-                    input.name=question.qNo;
-                    $(label).append(input,"A:"+question.choiceA);
-                    $(td_a).append(label);
-                    $(tr_a).append(td_a);
-                    $(table).append(tr_a);
+                allScore += question.experienceValue;
+                while(true){
+                    var index = Math.floor(Math.random()*(s));
+                    if(questionArray[index] == null){
+                        questionArray[index] = question;
+                        break;
+                    }
                 }
-                if(question.choiceB != ""  && question.choiceB != null){
-                    var tr_b = document.createElement("tr");
-                    var td_b = document.createElement("td");
-                    var label = document.createElement("label");
-                    var input = document.createElement("input");
-                    $(input).val("B");
-                    input.type="radio";
-                    input.name=question.qNo;
-                    $(label).append(input,"B:"+question.choiceB);
-                    $(td_b).append(label);
-                    $(tr_b).append(td_b);
-                    $(table).append(tr_b);
-                }
-                if(question.choiceC != "" && question.choiceC != null){
-                    var tr_c = document.createElement("tr");
-                    var td_c = document.createElement("td");
-                    var label = document.createElement("label");
-                    var input = document.createElement("input");
-                    $(input).val("C");
-                    input.type="radio";
-                    input.name=question.qNo;
-                    $(label).append(input,"C:"+question.choiceC);
-                    $(td_c).append(label);
-                    $(tr_c).append(td_c);
-                    $(table).append(tr_c);
-                }
-                if(question.choiceD != "" && question.choiceD != null){
-                    var tr_d = document.createElement("tr");
-                    var td_d = document.createElement("td");
-                    var label = document.createElement("label");
-                    var input = document.createElement("input");
-                    $(input).val("D");
-                    input.type="radio";
-                    input.name=question.qNo;
-                    $(label).append(input,"D:"+question.choiceD);
-                    $(td_d).append(label);
-                    $(tr_d).append(td_d);
-                    $(table).append(tr_d);
-                }
-                if(question.choiceE != "" && question.choiceE != null){
-                    var tr_e = document.createElement("tr");
-                    var td_e = document.createElement("td");
-                    var label = document.createElement("label");
-                    var input = document.createElement("input");
-                    $(input).val("E");
-                    input.type="radio";
-                    input.name=question.qNo;
-                    $(label).append(input,"E:"+question.choiceE);
-                    $(td_e).append(label);
-                    $(tr_e).append(td_e);
-                    $(table).append(tr_e);
-                }
-               $(div_question_info).append(table);
-
             }
+            needScore = allScore * currentLevel.rate/100;
+            $("#need_score").text(needScore);
+            $("#current_time").text(currentTime);
+            $("#current_score").text(0);
+
+
+
+            for(var i = 0;i<row;i++){
+                var div_row = document.createElement("div");
+                $(div_row).css({"width":"100%"});
+                for(var j = 0;j<col;j++){
+                    var div_out = document.createElement("div");
+                    $(div_out).css({"width":sqw,"height":sqw,"padding":"5px","float":"left"});
+                    var div_in = document.createElement("div");
+                    $(div_in).css({"background-color":"#3adb76","height":"100%","width":"100%","box-shadow":"5px 5px 2px #888888"});
+                    $(div_in).attr("id","q_"+i+"_"+j);
+                    //判断当前小方格是否有问题//todo
+                    $(div_in).click({"question":questionArray[i*col+j],"id":"q_"+i+"_"+j},showQuestion);
+                    $(div_out).append(div_in);
+
+                    $(div_row).append(div_out);
+                }
+                $(div_question_matrix).append(div_row);
+            }
+        }
+
+        function showQuestion(d){
+
+            currentQuestion = d.data.question;
+            var question = currentQuestion;
+            var id = d.data.id;
+            if(currentTime <= 0){
+                alert("翻牌次数用完了,本次答题挑战失败");
+                updateScore(0);
+                closeAnswerQuestionPanel();
+                return;
+            }
+            if(question == null){
+                showPopWindow(1000,"空白");
+                $("#"+id).css({"background-color":"#cacaca"})
+                $("#"+id).unbind("click");
+                updateScore(0);//如果翻到空白，也需要更新分数和次数
+                return;
+            }else{
+                $("#"+id).css({"background-color":"#cacaca"})
+                $("#"+id).unbind("click");
+            }
+            var maxw = document.documentElement.clientWidth;
+            var maxh = document.documentElement.clientHeight;
+
+            $("#question_panel").css({"z-index":"93","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+            $("#question_panel").show();
+
+            $("#submit_or_close").val("提交")
+            $("#submit_or_close").unbind("click");
+            $("#submit_or_close").click(doAnswer);
+
+            var table = document.createElement("table");
+            var tr_title = document.createElement("tr");
+            var td_title = document.createElement("td");
+            $(td_title).text(question.questionDescription);
+            $(tr_title).append(td_title);
+            $(table).append(tr_title);
+            if(question.choiceA != "" || question.choiceA != null){
+                var tr_a = document.createElement("tr");
+                var td_a = document.createElement("td");
+                var label = document.createElement("label");
+                var input = document.createElement("input");
+                $(input).val("A");
+                input.type="radio";
+                input.name=question.qNo;
+                $(label).append(input,"A:"+question.choiceA);
+                $(td_a).append(label);
+                $(tr_a).append(td_a);
+                $(table).append(tr_a);
+            }
+            if(question.choiceB != ""  && question.choiceB != null){
+                var tr_b = document.createElement("tr");
+                var td_b = document.createElement("td");
+                var label = document.createElement("label");
+                var input = document.createElement("input");
+                $(input).val("B");
+                input.type="radio";
+                input.name=question.qNo;
+                $(label).append(input,"B:"+question.choiceB);
+                $(td_b).append(label);
+                $(tr_b).append(td_b);
+                $(table).append(tr_b);
+            }
+            if(question.choiceC != "" && question.choiceC != null){
+                var tr_c = document.createElement("tr");
+                var td_c = document.createElement("td");
+                var label = document.createElement("label");
+                var input = document.createElement("input");
+                $(input).val("C");
+                input.type="radio";
+                input.name=question.qNo;
+                $(label).append(input,"C:"+question.choiceC);
+                $(td_c).append(label);
+                $(tr_c).append(td_c);
+                $(table).append(tr_c);
+            }
+            if(question.choiceD != "" && question.choiceD != null){
+                var tr_d = document.createElement("tr");
+                var td_d = document.createElement("td");
+                var label = document.createElement("label");
+                var input = document.createElement("input");
+                $(input).val("D");
+                input.type="radio";
+                input.name=question.qNo;
+                $(label).append(input,"D:"+question.choiceD);
+                $(td_d).append(label);
+                $(tr_d).append(td_d);
+                $(table).append(tr_d);
+            }
+            if(question.choiceE != "" && question.choiceE != null){
+                var tr_e = document.createElement("tr");
+                var td_e = document.createElement("td");
+                var label = document.createElement("label");
+                var input = document.createElement("input");
+                $(input).val("E");
+                input.type="radio";
+                input.name=question.qNo;
+                $(label).append(input,"E:"+question.choiceE);
+                $(td_e).append(label);
+                $(tr_e).append(td_e);
+                $(table).append(tr_e);
+            }
+            $("#question_experience_value").text("本题分数："+question.experienceValue);
+            $("#question_info").empty();
+            $("#question_info").append(table);
 
         }
 
         function doAnswer(){
 
             var answerArr = new Array();
+            var table = $("#question_info table");
 
-
-            var tables = $("#question_info table");
-           // alert(tables.length)
-            for(var i = 0;i<tables.length;i++){
-                var table = tables[i];
-                var inputs = $(table).find("input");
-
-                //alert(inputs.length)
-                var answerQuestion = new Object();
-                for(var j = 0;j<inputs.length;j++){
-                    var input = inputs[j];
-                    //alert(input.value+","+input.checked+","+input.name);
-                    if(input.checked) {
-                        answerQuestion.qNo = input.name;
-                        answerQuestion.uId = currentUser.uId;
-                        answerQuestion.choice = input.value;
-                        answerArr.push(answerQuestion);
-                        break;
-                    }
+            var inputs = $(table).find("input");
+            var answerQuestion = new Object();
+            for(var j = 0;j<inputs.length;j++){
+                var input = inputs[j];
+                //alert(input.value+","+input.checked+","+input.name);
+                if(input.checked) {
+                    answerQuestion.qNo = input.name;
+                    answerQuestion.uId = currentUser.uId;
+                    answerQuestion.choice = input.value;
+                    answerArr.push(answerQuestion);
+                    break;
                 }
             }
-
-
+            if(answerArr.length == 0){
+                $("#answer_message").text("请输入完整").css({"color":"red"});
+                return;
+            }
             $.ajax({
                 url: "/question/answerQuestion",
                 dataType: "text",
                 type: "post",
-                data: "answerQuestion="+JSON.stringify(answerArr),
+                data: "answerQuestion="+JSON.stringify(answerQuestion),
                 success: function (result) {
+                    var correct = "错误";
                     if(result == "true"){
-                        $("#answer_message").text("闯关成功,2秒后关闭").css({color:"red"});
-
-                    }else{
-                        $("#answer_message").text("闯关失败,2秒后关闭").css({color:"red"});
+                        correct="正确";
                     }
-                    setTimeout(closeAnswerQuestionPanel,2000);
+
+                    //不管正确与否，都将答案解析展示出来
+
+                    var h2_correct = document.createElement("h2");
+                    $(h2_correct).text(correct);
+                    var div_title = document.createElement("div");
+                    $(div_title).text(currentQuestion.questionDescription);
+                    var h4_correctOption = document.createElement("h4");
+                    $(h4_correctOption).text("正确答案："+currentQuestion.correctOption);
+                    var div_answerAnalysis = document.createElement("div");
+                    $(div_answerAnalysis).text(currentQuestion.answerAnalysis);
+                    $("#question_info").append(h2_correct,div_title,h4_correctOption,div_answerAnalysis);
+                    $("#submit_or_close").val("关闭")
+                    $("#submit_or_close").unbind("click");
+                    $("#submit_or_close").click(closeQuestionPanel);
+
+
+                    if(result == "true"){
+                        updateScore(currentQuestion.experienceValue);
+                    }else{
+                        updateScore(0);
+                    }
                 },
                 error: function (e) {
                     alert("错误")
                 }
             });
         }
+        function updateScore(experienceValue){
+            currentScore += experienceValue;
+            currentTime--;
+            $("#current_score").text(currentScore);
+            $("#current_time").text(currentTime);
+
+            //判断本次答题是否闯关成功
+            if(currentScore>=needScore){
+                //闯关成功
+                $.ajax({
+                    url: "/user/updateUserExperience",
+                    dataType: "text",
+                    type: "post",
+                    data: "acquireExperience="+currentScore,
+                    success: function (result) {
+                        if(result == "true"){
+                            alert("本次答题闯关成功，即将关闭本次答题");
+                            closeQuestionPanel();
+                            closeAnswerQuestionPanel();
+                        }
+                    },
+                    error: function (e) {
+                        alert("错误")
+                    }
+                });
+            }
+        }
 
 
-        function closeAnswerQuestionPanel(){
-            $('#answer_question').fadeOut(500);
+
+        function closeQuestionPanel(){
+            $("#question_panel").fadeOut(500);
             $("html").removeClass("unfoces");
             $("body").removeClass("unfoces");
             $("#level_info").removeClass("unfoces");
             $("#question_info").empty();
             $("#answer_message").text("");
+        }
+
+        function closeAnswerQuestionPanel(){
+            $("#answer_question").fadeOut(500);
+            $("html").removeClass("unfoces");
+            $("body").removeClass("unfoces");
+            $("#level_info").removeClass("unfoces");
+            $("#question_info").empty();
+            $("#answer_message").text("");
+            currentScore=0;
+            currentTime=0;
         }
         function closeLevelInfoPanel(){
             $('#level_info').fadeOut(500);
@@ -306,8 +467,6 @@
         div{
             border: 0px solid;
         }
-
-
     </style>
 
 
@@ -393,7 +552,21 @@
 </div>
 
 
+<div style="width: 400px">
 
+        <div style="width: 100px;height: 100px; padding: 5px; float:left;">
+            <div style="background-color: #3adb76;width: 100%;height: 100%;box-shadow: 5px 5px 2px #888888;"></div>
+        </div>
+        <div style="width: 100px;height: 100px; padding: 5px; float:left;">
+            <div style="background-color: #3adb76;width: 100%;height: 100%;box-shadow: 5px 5px 2px #888888;"></div>
+        </div>
+        <div style="width: 100px;height: 100px; padding: 5px; float:left;">
+            <div style="background-color: #3adb76;width: 100%;height: 100%;box-shadow: 5px 5px 2px #888888;"></div>
+        </div>
+        <div style="width: 100px;height: 100px; padding: 5px; float:left;">
+            <div style="background-color: #3adb76;width: 100%;height: 100%;box-shadow: 5px 5px 2px #888888;"></div>
+        </div>
+</div>
 
 
 <div  id="answer_question" style="position: fixed; display: none;  padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
@@ -401,63 +574,61 @@
         <button onclick="closeAnswerQuestionPanel()" class="button success">取消</button>
     </div>
 
-    <h3 id="answer_question_title" style="font-weight: bold"></h3>
-    <div class="grid-padding-x">
-        <div class="cell small-12" id="question_info">
-            <table>
-                <tbody>
-                <tr>
-                    <td>宏定义的宏展开是在(    )阶段完成的。</td>
-                </tr>
-                <tr></tr>
-                <tr>
-                    <td><label> <input name="answer"  type="radio" value="A">A:预处理</label></td>
-                </tr>
-                <tr>
-                    <td><label> <input name="answer"  type="radio" value="B">B:预处理</label></td>
-                </tr>
-                <tr>
-                   <td> <label><input name="answer"  type="radio" value="C">C:预处理</label></td>
-                </tr>
-                <tr>
-                    <td><label> <input name="answer"  type="radio" value="D">D:预处理</label></td>
-                </tr>
-                </tbody>
-            </table>
+    <div style="font-weight: bold">
+        <span class="large-text-center">请翻牌</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-            <table>
-                <tbody>
-                <tr>
-                    <td>宏定义的宏展开是在(    )阶段完成的。</td>
-                </tr>
-                <tr></tr>
-                <tr>
-                    <td><label> <input name="answer2"  type="radio" value="A">A:预处理</label></td>
-                </tr>
-                <tr>
-                    <td><label> <input name="answer2"  type="radio" value="B">B:预处理</label></td>
-                </tr>
-                <tr>
-                    <td> <label><input name="answer2"  type="radio" value="C">C:预处理</label></td>
-                </tr>
-                <tr>
-                    <td><label> <input name="answer2"  type="radio" value="D">D:预处理</label></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="cell">
-            <input type="button" onclick="doAnswer()" class="button" value="提交" /><span id="answer_message"></span>
-        </div>
-
+        需要分数：<span id="need_score"></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        当前剩余翻牌次数：<span id="current_time"></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        当前得分：<span id="current_score"></span>
     </div>
+    <div class="grid-padding-x">
+        <div  id="question_matrix" class="cell small-12 medium-8 large-6"   style="border: 1px solid">
 
+        </div>
+        <div   style="clear:both;border: 1px solid">
+            <input type="button" onclick="doAnswer()" class="button" value="提交" />
+        </div>
+    </div>
 </div>
+
+<div  id="question_panel" style="position: fixed; display: none;  padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
+    <div class="grid-padding-x">
+        <h4 id="question_experience_value"></h4>
+        <div class="cell small-12" id="question_info">
+
+        </div>
+        <div class="cell small-12">
+            <input type="button" id="submit_or_close"  class="button" value="提交" /><span id="answer_message"></span>
+        </div>
+    </div>
+</div>
+
+
 <hr/>
 
 </div>
 
+
+<script>
+
+    function showPopWindow(t,message){
+
+        $("#pop_window").text(message);
+        $("#pop_window").show().fadeOut(t);
+    }
+</script>
+
+<div id="pop_window"   style="border:1px solid red;
+			color: white; background-color: #000000;  opacity:0.9;
+			z-index: 100;
+			width:160px;height:120px; text-align: center; display: none;
+			border-radius: 10px; font-size: 30px; line-height: 120px;
+			position:absolute;left:50%;margin-left:-80px;top:50%;margin-top:-60px;">
+    空白
+</div>
 
 </body>
 </html>

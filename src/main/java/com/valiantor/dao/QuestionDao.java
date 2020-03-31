@@ -14,6 +14,7 @@ public interface QuestionDao {
     public int deleteQuestionFromLevel(@Param("qNo") int qNo);
 
     public List<Question> findQuestionByQNoList(@Param("qNoList") List<Integer> qNoList);
+    public Question findQuestionByQNo(int qNo);
 
     int addQuestion(@Param("question") Question question);
 }
