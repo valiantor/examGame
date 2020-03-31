@@ -16,7 +16,7 @@ public class App {
 
     @RequestMapping("/")
     public String index(){
-        return "redirect:main.html";
+        return "redirect:user_main.html";
     }
 
     @RequestMapping("/admin")
