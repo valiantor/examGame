@@ -553,22 +553,6 @@
 </div>
 
 
-<div style="width: 400px">
-
-        <div style="width: 100px;height: 100px; padding: 5px; float:left;">
-            <div style="background-color: #3adb76;width: 100%;height: 100%;box-shadow: 5px 5px 2px #888888;"></div>
-        </div>
-        <div style="width: 100px;height: 100px; padding: 5px; float:left;">
-            <div style="background-color: #3adb76;width: 100%;height: 100%;box-shadow: 5px 5px 2px #888888;"></div>
-        </div>
-        <div style="width: 100px;height: 100px; padding: 5px; float:left;">
-            <div style="background-color: #3adb76;width: 100%;height: 100%;box-shadow: 5px 5px 2px #888888;"></div>
-        </div>
-        <div style="width: 100px;height: 100px; padding: 5px; float:left;">
-            <div style="background-color: #3adb76;width: 100%;height: 100%;box-shadow: 5px 5px 2px #888888;"></div>
-        </div>
-</div>
-
 
 <div  id="answer_question" style="position: fixed; display: none;  padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
     <div class="text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
@@ -578,7 +562,6 @@
     <div style="font-weight: bold">
         <span class="large-text-center">请翻牌</span>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
         需要分数：<span id="need_score"></span>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         当前剩余翻牌次数：<span id="current_time"></span>
@@ -586,10 +569,9 @@
         当前得分：<span id="current_score"></span>
     </div>
     <div class="grid-padding-x">
-        <div  id="question_matrix" class="cell small-12 medium-8 large-6"   style="border: 1px solid">
-
+        <div  id="question_matrix" class="cell small-12 medium-8 large-6"  >
         </div>
-        <div   style="clear:both;border: 1px solid">
+        <div   style="clear:both">
             <input type="button" onclick="doAnswer()" class="button" value="提交" />
         </div>
     </div>
@@ -631,6 +613,10 @@
     空白
 </div>
 
+<!--底部版权-->
+<div id="footer">
+    <script>$("#footer").load("footer.html")</script>
+</div>
 </body>
 </html>
 
