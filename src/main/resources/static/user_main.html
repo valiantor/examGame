@@ -111,6 +111,7 @@
             $("html").addClass("unfoces");
             $("body").addClass("unfoces");
             $("#answer_question").addClass("unfoces");
+            $("#question_panel").addClass("unfoces");
 
             $("#level_title").text("关卡"+currentLevel.grade);
             $("#level_grade").text(currentLevel.grade);
@@ -154,6 +155,7 @@
                         $("html").addClass("unfoces");
                         $("body").addClass("unfoces");
                         $("#level_info").addClass("unfoces");
+                        $("#question_panel").addClass("unfoces");
 
                         loadQuestionMatrix(questionList);
                     }
@@ -260,6 +262,10 @@
 
             $("#question_panel").css({"z-index":"93","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
             $("#question_panel").show();
+            $("html").addClass("unfoces");
+            $("body").addClass("unfoces");
+            $("#level_info").addClass("unfoces");
+            $("#answer_question").addClass("unfoces");
 
             $("#submit_or_close").val("提交")
             $("#submit_or_close").unbind("click");
@@ -434,18 +440,18 @@
 
         function closeQuestionPanel(){
             $("#question_panel").fadeOut(500);
-            $("html").removeClass("unfoces");
-            $("body").removeClass("unfoces");
+
             $("#level_info").removeClass("unfoces");
+            $("#answer_question").removeClass("unfoces");
             $("#question_info").empty();
             $("#answer_message").text("");
         }
 
         function closeAnswerQuestionPanel(){
             $("#answer_question").fadeOut(500);
-            $("html").removeClass("unfoces");
-            $("body").removeClass("unfoces");
+
             $("#level_info").removeClass("unfoces");
+            $("#question_panel").removeClass("unfoces");
             $("#question_info").empty();
             $("#answer_message").text("");
             currentScore=0;
@@ -456,6 +462,7 @@
             $("html").removeClass("unfoces");
             $("body").removeClass("unfoces");
             $("#answer_question").removeClass("unfoces");
+            $("#question_panel").removeClass("unfoces");
         }
 
         function sleep(delay) {
