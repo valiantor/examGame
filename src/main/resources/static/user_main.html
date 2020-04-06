@@ -20,11 +20,15 @@
         var currentLevel;//当前关卡信息
         var currentQuestionList;//当前问题列表
         var lastLevel;//最后一个关卡(用户所处关卡)
+        var allLevelList;
 
         var currentQuestion;//当前问题
         var currentTime;//当前翻牌次数
         var currentScore = 0;//当前答题获取的分数
         var needScore ;
+
+
+        var lock = false;//同步锁
         $(document).ready(function() {
             findAllLevel();
         });
@@ -34,8 +38,9 @@
                 url: "/level/findAllLevel",
                 dataType: "text",
                 success: function (result) {
-                    var levelList = $.parseJSON(result);
-                    loadAllLevel(levelList);
+                    allLevelList = $.parseJSON(result);
+                    loadAllLevel(allLevelList);
+                    lock = false;
                 },
                 error: function (e) {
                     alert("错误")
@@ -62,7 +67,7 @@
                 $(div2).addClass("grid-padding-x content_center").css({"box-shadow": "10px 10px 5px #888888","width":"150px","border-radius": "5px"});
                 var div3_1 = document.createElement("div");
 
-                if(currentUser.currentLevelNo >= level.lNo){
+                if(currentUser.experience >= level.experienceNeed){
                     $(div3_1).addClass("large-12 medium-12 ").css({"overflow":"hidden","background-color":"#3adb76", "height":"100px"});
                 }else{
                     $(div3_1).addClass("large-12 medium-12 ").css({"overflow":"hidden","background-color":"#cacaca", "height":"100px"});
@@ -78,7 +83,7 @@
                 div2.append(div3_2);
                 div1.append(div2);
 
-                if(currentUser.currentLevelNo >= level.lNo){
+                if(currentUser.experience >= level.experienceNeed){
                     $(div2).click({"level":level},showLevelInfo);
                 }else{
                     $(span).text("关卡"+grade+"(所需经验:"+level.experienceNeed+")");
@@ -98,28 +103,31 @@
         }
 
 
+    function doShowLevelInfo(level){
+        currentLevel = level;
+        var maxw = document.documentElement.clientWidth;
+        var maxh = document.documentElement.clientHeight;
+        $("#level_info").css({"z-index":"90","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+        $("#level_info").show();
+        $("html").addClass("unfoces");
+        $("body").addClass("unfoces");
+        $("#answer_question").addClass("unfoces");
+        $("#question_panel").addClass("unfoces");
 
+        $("#level_title").text("关卡"+currentLevel.grade);
+        $("#level_grade").text(currentLevel.grade);
+        $("#level_description").text(currentLevel.description);
+        $("#level_experience_need").text(currentLevel.experienceNeed);
+        $("#level_rate").text(currentLevel.rate+"%");
+
+        $("#start_answer_button").click({"lNo":currentLevel.lNo},showStartAnswer);
+    }
 
 
         function showLevelInfo(d){
 
             currentLevel = d.data.level;
-            var maxw = document.documentElement.clientWidth;
-            var maxh = document.documentElement.clientHeight;
-            $("#level_info").css({"z-index":"90","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
-            $("#level_info").show();
-            $("html").addClass("unfoces");
-            $("body").addClass("unfoces");
-            $("#answer_question").addClass("unfoces");
-            $("#question_panel").addClass("unfoces");
-
-            $("#level_title").text("关卡"+currentLevel.grade);
-            $("#level_grade").text(currentLevel.grade);
-            $("#level_description").text(currentLevel.description);
-            $("#level_experience_need").text(currentLevel.experienceNeed);
-            $("#level_rate").text(currentLevel.rate+"%");
-
-            $("#start_answer_button").click({"lNo":currentLevel.lNo},showStartAnswer);
+            doShowLevelInfo(currentLevel);
           //  findCurrentRankInfo(currentLevel.lNo);
 
         }
@@ -408,6 +416,16 @@
                 }
             });
         }
+        function findLevelByGrade(grade){
+            for(var i = 0;i<allLevelList.length;i++){
+
+                var level = allLevelList[i];
+                if(level.grade==grade){
+                    return level;
+                }
+            }
+            return null;
+        }
         function updateScore(experienceValue){
             currentScore += experienceValue;
             currentTime--;
@@ -417,6 +435,7 @@
             //判断本次答题是否闯关成功
             if(currentScore>=needScore){
                 //闯关成功
+
                 $.ajax({
                     url: "/user/updateUserExperience",
                     dataType: "text",
@@ -424,16 +443,48 @@
                     data: "acquireExperience="+currentScore,
                     success: function (result) {
                         if(result == "true"){
-                            alert("本次答题闯关成功，即将关闭本次答题");
-                            closeQuestionPanel();
-                            closeAnswerQuestionPanel();
+                            currentUser.experience += currentScore;
+                            $("#user_experience").text("经验值："+currentUser.experience);
+                            var nextLevel = findLevelByGrade(currentLevel.grade+1);
+                            //alert("下一关卡："+nextLevel.grade+",currentScore:"+currentScore+",needScore:"+needScore);
+                            if(nextLevel != null && currentUser.experience >= nextLevel.experienceNeed){
+                                var r = confirm("下一关卡解锁，是否现在进入下一关卡？");
+                                if(r==true){
+                                    closeQuestionPanel();
+                                    closeAnswerQuestionPanel();
+                                    closeLevelInfoPanel();
+                                    //lock = true;
+                                    loadAllLevel(allLevelList);
+                                    //while(lock);//直到findAllLevel执行完
+                                    closeQuestionPanel();
+                                    closeAnswerQuestionPanel();
+                                    closeLevelInfoPanel();
+
+                                    setInterval(function () {
+                                        doShowLevelInfo(nextLevel);
+                                    },500)
+
+
+                                }else{
+                                    closeQuestionPanel();
+                                    closeAnswerQuestionPanel();
+                                }
+                            }else{
+                                alert("恭喜你！！本次答题闯关成功，距离下一关卡还差"+(nextLevel.experienceNeed-currentUser.experience)+"分，请努力");
+                                closeQuestionPanel();
+                                closeAnswerQuestionPanel();
+                            }
                         }
                     },
                     error: function (e) {
                         alert("错误")
                     }
                 });
+
+
             }
+
+
         }
 
 

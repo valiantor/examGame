@@ -39,4 +39,10 @@ public class LevelController {
     public Level findLevelByLNo(@RequestParam("lNo") int lNo){
         return levelService.findLevelByLNo(lNo);
     }
+
+    @RequestMapping("findLevelByGrade")
+    public Level findLevelByGrade(@RequestParam("grade") int grade){
+        return levelService.findLevelByGrade(grade);
+    }
+
 }
