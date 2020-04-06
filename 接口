@@ -1,6 +1,0 @@
-关卡类：
-level
-
-题类接口：
-question/findAllQuestionByLNo(String lNo)   根据关卡编号查询当前关卡下的所有题
-question/findQuestionPageByLNo(String lNo,int currPage,int numPerPage)   根据关卡编号查询当前关卡下的所有题

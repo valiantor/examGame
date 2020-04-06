@@ -460,7 +460,8 @@
                                     closeAnswerQuestionPanel();
                                     closeLevelInfoPanel();
 
-                                    setInterval(function () {
+                                    setTimeout(function () {
+                                       // alert("setTimeOut!!");
                                         doShowLevelInfo(nextLevel);
                                     },500)
 
