@@ -648,6 +648,38 @@
         }
 
 
+        function showAddQuestionFromFile(){
+            var maxw = document.documentElement.clientWidth;
+            var maxh = document.documentElement.clientHeight;
+            $("#add_question_from_file").css({"z-index":"80","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+            $("#add_question_from_file").show();
+            $("html").addClass("unfoces");
+            $("body").addClass("unfoces");
+            $("#level_info").addClass("unfoces");
+        }
+        function uploadQuestionFile(){
+            var formdata = new FormData(document.getElementById("form"));
+            $.ajax({
+                url: "/question/uploadQuestionFile",
+                type: "post",
+                data:formdata,
+                dataType:"text",
+                processData: false,
+                contentType: false,
+                success:function(result){
+                    if(result=="true"){
+                        showPopWindow(1000,"上传成功")
+                    }else{
+                        showPopWindow(1000,"上传失败")
+                    }
+                },
+                error:function(e){
+                    showPopWindow(1000,"网络错误")
+                }
+            });
+        }
+
+
         
         function closeAddQuestionFromDb(){
             $('#add_question_from_db').fadeOut(500);
@@ -689,6 +721,15 @@
             $("#level_info").removeClass("unfoces");
             $("#add_question_from_db").removeClass("unfoces");
         }
+        function closeAddQuestionFromFile(){
+            $('#add_question_from_file').fadeOut(500);
+            $("html").removeClass("unfoces");
+            $("body").removeClass("unfoces");
+            $("#add_level").removeClass("unfoces");
+            $("#level_info").removeClass("unfoces");
+        }
+
+
     </script>
 
     <style>
@@ -708,6 +749,7 @@
 
 <div class="grid-container  fluid margin_top" >
     <div class="cell text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
+        <button class="button dark"  id="add_question_from_file_button" onclick="showAddQuestionFromFile()">从文件中导入题</button>
         <button class="button dark"  id="add_level_button" onclick="showAddLevel()">添加关卡</button>
     </div>
 
@@ -894,6 +936,20 @@
     </div>
 </div>
 
+<div id="add_question_from_file"  style="position: fixed; display: none; padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
+    <div class="content_center grid-container" >
+        <div class="text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
+            <button onclick="closeAddQuestionFromFile()" class="button success">关闭</button>
+        </div>
+        <h1>请上传文件</h1>
+        <form id="form">
+
+            <input type="file"  id="file" name="file" placeholder="file">
+
+            <button type="button" onclick="uploadQuestionFile()" class="button success">提交</button>
+        </form>
+    </div>
+</div>
 
 
 

@@ -11,12 +11,9 @@
                 success: function (result) {
 
                     if(result == "" || null == result) {
-
                         window.location="admin_login.html";
                         $("#admin_info").text("未登录");
                     }else{
-
-
                         $("#admin_info").text(result+" 已登陆");
                         $("#admin_login").addClass("invisible");
                     }
@@ -28,6 +25,8 @@
         }
 
         checkSession();
+
+
 
     </script>
 <div class="title-bar" data-responsive-toggle="example-menu" data-hide-for="medium">
@@ -45,8 +44,8 @@
     </div>
     <div class="top-bar-right">
         <ul class="menu">
-            <li><input type="search" id="search_content" placeholder="Search"></li>
-            <li><button type="button" class="button"  onclick="searchQuestion()">查找</button></li>
+            <li><input type="search" id="searchContent" placeholder="search"></li>
+            <li><button type="button" class="button"  >查找</button></li>
         </ul>
     </div>
 </div>

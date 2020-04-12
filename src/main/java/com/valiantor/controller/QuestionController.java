@@ -11,8 +11,11 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 @RestController
 @RequestMapping("question")
@@ -126,5 +129,17 @@ public class QuestionController {
         return questionService.answerQuestion(answerQuestion);
     }
 
+    @RequestMapping("uploadQuestionFile")
+    public boolean uploadQuestionFile(@RequestParam("file") MultipartFile file){
+        try {
+            file.transferTo(new File("D:\\222.doc"));
+
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 
 }
