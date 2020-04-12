@@ -15,6 +15,18 @@
         values (#{question.questionDescription},#{question.testPoint},#{question.choiceA},#{question.choiceB},#{question.choiceC},#{question.choiceD},#{question.choiceE},#{question.correctOption},#{question.answerAnalysis},#{question.experienceValue},#{question.lNo})
     </insert>
 
+    <update id="updateQuestion" parameterType="com.valiantor.entity.Question">
+        update question
+        set question_description=#{question.questionDescription},test_point=#{question.testPoint},
+            choice_a=#{question.choiceA},
+            choice_b=#{question.choiceB},choice_c=#{question.choiceC},choice_d=#{question.choiceD},
+            choice_e=#{question.choiceE},correct_option=#{question.correctOption},
+            answer_analysis=#{question.answerAnalysis},experience_value=#{question.experienceValue},
+            l_no=#{question.lNo}
+        where q_no=#{question.qNo}
+    </update>
+
+
     <select id="findQuestionByQNoList" resultType="com.valiantor.entity.Question" parameterType="java.util.List">
         select * from question
         where q_no in
@@ -34,6 +46,11 @@
     <select id="findQuestionPageBylNo" resultType="com.valiantor.entity.Question">
         select * from question
         where l_no = #{lNo}
+        limit #{offset},#{numPerPage}
+    </select>
+    <select id="findQuestionFromDB" resultType="com.valiantor.entity.Question">
+        select * from question
+        where l_no is null
         limit #{offset},#{numPerPage}
     </select>
 

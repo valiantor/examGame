@@ -13,6 +13,7 @@ import com.valiantor.entity.extro.LevelQuestionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -154,6 +155,44 @@ public class QuestionService {
        return questionDao.addQuestion(question) > 0;
     }
 
+    public boolean updateQuestion(Question question) {
+
+        Question oldQuestion = questionDao.findQuestionByQNo(question.getqNo());
+        if(!StringUtils.isEmpty(question.getQuestionDescription())){
+            oldQuestion.setQuestionDescription(question.getQuestionDescription());
+        }
+        if(!StringUtils.isEmpty(question.getChoiceA())){
+            oldQuestion.setChoiceA(question.getChoiceA());
+        }
+        if(!StringUtils.isEmpty(question.getChoiceB())){
+            oldQuestion.setChoiceB(question.getChoiceB());
+        }
+        if(!StringUtils.isEmpty(question.getChoiceC())){
+            oldQuestion.setChoiceC(question.getChoiceC());
+        }
+        if(!StringUtils.isEmpty(question.getChoiceD())){
+            oldQuestion.setChoiceD(question.getChoiceD());
+        }
+        if(!StringUtils.isEmpty(question.getChoiceE())){
+            oldQuestion.setChoiceE(question.getChoiceE());
+        }
+        if(!StringUtils.isEmpty(question.getCorrectOption())){
+            oldQuestion.setCorrectOption(question.getCorrectOption());
+        }
+        if(!StringUtils.isEmpty(question.getAnswerAnalysis())){
+            oldQuestion.setAnswerAnalysis(question.getAnswerAnalysis());
+        }
+        if(question.getExperienceValue()>0){
+            oldQuestion.setExperienceValue(question.getExperienceValue());
+        }
+        if(question.getlNo()>0){
+            oldQuestion.setlNo(question.getlNo());
+        }
+
+
+        return questionDao.updateQuestion(oldQuestion) > 0;
+    }
+
     public boolean answerQuestion(AnswerQuestion answerQuestion) {
 
         Question question = questionDao.findQuestionByQNo(answerQuestion.getqNo());
@@ -173,5 +212,20 @@ public class QuestionService {
 
         userQuestionDao.addUserQuestionList(userQuestionList);
         return "Y".equals(userQuestion.getCorrectness());
+    }
+
+
+    public List<Question> findQuestionFromDB(int currentPage, int numPerPage) {
+        int offset =(currentPage-1)*numPerPage;
+
+        return questionDao.findQuestionFromDB(offset,numPerPage);
+    }
+
+    public boolean addQuestionListFormDb(List<Question> questionList) {
+        for(Question question:questionList){
+           if(!updateQuestion(question)) return false;
+        }
+
+        return true;
     }
 }

@@ -17,4 +17,7 @@ public interface QuestionDao {
     public Question findQuestionByQNo(int qNo);
 
     int addQuestion(@Param("question") Question question);
+    int updateQuestion(@Param("question") Question question);
+
+    List<Question> findQuestionFromDB(@Param("offset")int offset, @Param("numPerPage")  int numPerPage);
 }

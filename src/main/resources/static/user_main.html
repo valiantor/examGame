@@ -466,28 +466,6 @@
                                 $("#question_panel").addClass("unfoces");
                                 $("#btn_next_level").click({"nextLevel":nextLevel},intoNextLevel);
 
-                               /* var r = confirm("下一关卡解锁，是否现在进入下一关卡？");
-                                if(r==true){
-                                    closeQuestionPanel();
-                                    closeAnswerQuestionPanel();
-                                    closeLevelInfoPanel();
-                                    //lock = true;
-                                    loadAllLevel(allLevelList);
-                                    //while(lock);//直到findAllLevel执行完
-                                    closeQuestionPanel();
-                                    closeAnswerQuestionPanel();
-                                    closeLevelInfoPanel();
-
-                                    setTimeout(function () {
-                                       // alert("setTimeOut!!");
-                                        doShowLevelInfo(nextLevel);
-                                    },700)
-
-
-                                }else{
-                                    closeQuestionPanel();
-                                    closeAnswerQuestionPanel();
-                                }*/
                             }else{
                                 alert("恭喜你！！本次答题闯关成功，距离下一关卡还差"+(nextLevel.experienceNeed-currentUser.experience)+"分，请努力");
                                 closeQuestionPanel();

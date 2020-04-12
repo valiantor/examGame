@@ -29,6 +29,25 @@ public class QuestionController {
         return questionService.addQuestion(question);
     }
 
+    @RequestMapping("addQuestionListFormDb")
+    public boolean addQuestionListFormDb(@RequestParam("questionList") String questionListJson){
+        List<Question> questionList= new Gson().fromJson(questionListJson,
+                new TypeToken<List<Question>>() {
+        }.getType());
+        if(CollectionUtils.isEmpty(questionList)) return false;
+
+        return questionService.addQuestionListFormDb(questionList);
+    }
+
+
+    @RequestMapping("updateQuestion")
+    public boolean updateQuestion(@RequestParam("question") String questionJson){
+        Question question = new Gson().fromJson(questionJson, Question.class);
+        if(question==null) return false;
+
+        return questionService.updateQuestion(question);
+    }
+
 
     /**
      * 查询指定关卡下面的所有题
@@ -39,6 +58,20 @@ public class QuestionController {
     public List<Question> findAllQuestionByLNo(@RequestParam("lNo") int lNo){
         return questionService.findAllQuestionBylNo(lNo);
     }
+
+    /**
+     * 获取数据库中未在关卡里的题
+     * @param currentPage 当前分页
+     * @param numPerPage 每页获取的题数目
+     * @return
+     */
+
+    @RequestMapping("findQuestionFromDB")
+    public List<Question> findQuestionFromDB(@RequestParam("currentPage") int currentPage,@RequestParam("numPerPage") int numPerPage){
+        return questionService.findQuestionFromDB(currentPage,numPerPage);
+    }
+
+
 
     /**
      * 查询当前关卡下面指定分页的题
