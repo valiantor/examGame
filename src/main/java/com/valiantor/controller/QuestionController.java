@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.valiantor.entity.Question;
 import com.valiantor.entity.extro.AnswerQuestion;
+import com.valiantor.entity.extro.LevelQuestionInfo;
 import com.valiantor.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -58,7 +59,7 @@ public class QuestionController {
     }
 
     @RequestMapping(value = "findRandomQuestionByLNoAndNum")
-    public List<Question> findRandomQuestionByLNoAndNum(@RequestParam("lNo") int lNo, @RequestParam("num") int num, HttpSession session){
+    public LevelQuestionInfo findRandomQuestionByLNoAndNum(@RequestParam("lNo") int lNo, @RequestParam("num") int num, HttpSession session){
 
         Object uIdObj = session.getAttribute("uId");
         String uId = null;

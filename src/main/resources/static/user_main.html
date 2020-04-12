@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="./css/foundation.min.css">
     <script src="js/vendor/jquery.js"></script>
+
     <link rel="stylesheet" href="css/foundation.css">
     <link rel="stylesheet" href="css/app.css">
 
@@ -25,6 +26,7 @@
         var currentQuestion;//当前问题
         var currentTime;//当前翻牌次数
         var currentScore = 0;//当前答题获取的分数
+        var currentRemainingQuestions;//当前关卡答题剩余题量
         var needScore ;
 
 
@@ -40,7 +42,6 @@
                 success: function (result) {
                     allLevelList = $.parseJSON(result);
                     loadAllLevel(allLevelList);
-                    lock = false;
                 },
                 error: function (e) {
                     alert("错误")
@@ -67,7 +68,7 @@
                 $(div2).addClass("grid-padding-x content_center").css({"box-shadow": "10px 10px 5px #888888","width":"150px","border-radius": "5px"});
                 var div3_1 = document.createElement("div");
 
-                if(currentUser.experience >= level.experienceNeed){
+                if(currentUser.experience >= level.experienceNeed && currentUser.currentLevelNo >= level.lNo){
                     $(div3_1).addClass("large-12 medium-12 ").css({"overflow":"hidden","background-color":"#3adb76", "height":"100px"});
                 }else{
                     $(div3_1).addClass("large-12 medium-12 ").css({"overflow":"hidden","background-color":"#cacaca", "height":"100px"});
@@ -83,7 +84,7 @@
                 div2.append(div3_2);
                 div1.append(div2);
 
-                if(currentUser.experience >= level.experienceNeed){
+                if(currentUser.experience >= level.experienceNeed && currentUser.currentLevelNo >= level.lNo){
                     $(div2).click({"level":level},showLevelInfo);
                 }else{
                     $(span).text("关卡"+grade+"(所需经验:"+level.experienceNeed+")");
@@ -93,7 +94,6 @@
             }
         }
 
-
         /**
          * 获取当前关卡的排行信息
          * @param lNo
@@ -101,8 +101,6 @@
         function findCurrentRankInfo(lNo){
 
         }
-
-
     function doShowLevelInfo(level){
         currentLevel = level;
         var maxw = document.documentElement.clientWidth;
@@ -155,7 +153,7 @@
                 data: "lNo="+lNo+"&num="+q,
                 success: function (result) {
                     if(result != ""){
-                        var questionList = $.parseJSON(result);
+                        var levelQuestionInfo = $.parseJSON(result);
                         var maxw = document.documentElement.clientWidth;
                         var maxh = document.documentElement.clientHeight;
                         $("#answer_question").css({"z-index":"91","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
@@ -164,8 +162,7 @@
                         $("body").addClass("unfoces");
                         $("#level_info").addClass("unfoces");
                         $("#question_panel").addClass("unfoces");
-
-                        loadQuestionMatrix(questionList);
+                        loadQuestionMatrix(levelQuestionInfo);
                     }
                 },
                 error: function (e) {
@@ -178,7 +175,8 @@
          * 列出问题矩阵
          * @param questionList
          */
-        function loadQuestionMatrix(questionList){
+        function loadQuestionMatrix(levelQuestionInfo){
+            var questionList = levelQuestionInfo.questionList;
             currentQuestionList = questionList;
             var div_question_matrix=$("#question_matrix");
             $(div_question_matrix).empty();
@@ -219,9 +217,11 @@
                 }
             }
             needScore = allScore * currentLevel.rate/100;
+            currentRemainingQuestions = questionList.length;
             $("#need_score").text(needScore);
             $("#current_time").text(currentTime);
             $("#current_score").text(0);
+            $("#remaining_questions").text(currentRemainingQuestions);
 
 
 
@@ -257,12 +257,19 @@
             }
             if(question == null){
                 showPopWindow(1000,"空白");
-                $("#"+id).css({"background-color":"#cacaca"})
-                $("#"+id).unbind("click");
+
+                $("#"+id).css({"background-color":"#cacaca"});
+                setTimeout(function () {
+                    $("#"+id).css({"background-color":"#3adb76"})
+                },800);
+            //    alert("ddd")
+               // $("#"+id).animate({"background-color":"#3adb76"},'slow');
+               // $("#"+id).unbind("click");
                 updateScore(0);//如果翻到空白，也需要更新分数和次数
                 return;
             }else{
                 $("#"+id).css({"background-color":"#cacaca"})
+                $("#remaining_questions").text(--currentRemainingQuestions);
                 $("#"+id).unbind("click");
             }
             var maxw = document.documentElement.clientWidth;
@@ -388,7 +395,7 @@
                     if(result == "true"){
                         correct="正确";
                     }
-
+                    //将当前关卡剩余题
                     //不管正确与否，都将答案解析展示出来
 
                     var h2_correct = document.createElement("h2");
@@ -443,12 +450,23 @@
                     data: "acquireExperience="+currentScore,
                     success: function (result) {
                         if(result == "true"){
-                            currentUser.experience += currentScore;
+                            checkSession();//更新当前用户信息
                             $("#user_experience").text("经验值："+currentUser.experience);
                             var nextLevel = findLevelByGrade(currentLevel.grade+1);
                             //alert("下一关卡："+nextLevel.grade+",currentScore:"+currentScore+",needScore:"+needScore);
                             if(nextLevel != null && currentUser.experience >= nextLevel.experienceNeed){
-                                var r = confirm("下一关卡解锁，是否现在进入下一关卡？");
+                                var maxw = document.documentElement.clientWidth;
+                                var maxh = document.documentElement.clientHeight;
+                                $("#answer_success").css({"z-index":"95","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+                                $("#answer_success").show();
+                                $("html").addClass("unfoces");
+                                $("body").addClass("unfoces");
+                                $("#level_info").addClass("unfoces");
+                                $("#answer_question").addClass("unfoces");
+                                $("#question_panel").addClass("unfoces");
+                                $("#btn_next_level").click({"nextLevel":nextLevel},intoNextLevel);
+
+                               /* var r = confirm("下一关卡解锁，是否现在进入下一关卡？");
                                 if(r==true){
                                     closeQuestionPanel();
                                     closeAnswerQuestionPanel();
@@ -463,13 +481,13 @@
                                     setTimeout(function () {
                                        // alert("setTimeOut!!");
                                         doShowLevelInfo(nextLevel);
-                                    },500)
+                                    },700)
 
 
                                 }else{
                                     closeQuestionPanel();
                                     closeAnswerQuestionPanel();
-                                }
+                                }*/
                             }else{
                                 alert("恭喜你！！本次答题闯关成功，距离下一关卡还差"+(nextLevel.experienceNeed-currentUser.experience)+"分，请努力");
                                 closeQuestionPanel();
@@ -488,6 +506,24 @@
 
         }
 
+        function intoNextLevel(d){
+
+            closeQuestionPanel();
+            closeAnswerQuestionPanel();
+            closeLevelInfoPanel();
+            //lock = true;
+            loadAllLevel(allLevelList);
+            //while(lock);//直到findAllLevel执行完
+            closeQuestionPanel();
+            closeAnswerQuestionPanel();
+            closeLevelInfoPanel();
+            $("#answer_success").fadeOut(500);
+            setTimeout(function () {
+                 //alert("setTimeOut!!");
+                doShowLevelInfo(d.data.nextLevel);
+            },700)
+
+        }
 
 
         function closeQuestionPanel(){
@@ -515,6 +551,22 @@
             $("body").removeClass("unfoces");
             $("#answer_question").removeClass("unfoces");
             $("#question_panel").removeClass("unfoces");
+            loadAllLevel(allLevelList);
+        }
+
+        function closeAnswerSuccess(){
+            $('#answer_success').fadeOut(500);
+            $('#question_panel').fadeOut(500);
+          //  $('#answer_question').fadeOut(500);
+            $("html").removeClass("unfoces");
+            $("body").removeClass("unfoces");
+          //  $("#answer_question").removeClass("unfoces");
+            $("#question_panel").removeClass("unfoces");
+            $("#level_info").removeClass("unfoces");
+        }
+
+        function close() {
+
         }
 
         function sleep(delay) {
@@ -626,13 +678,12 @@
         当前剩余翻牌次数：<span id="current_time"></span>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         当前得分：<span id="current_score"></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        剩余题量：<span id="remaining_questions"></span>
     </div>
     <div class="grid-padding-x">
         <div  id="question_matrix" class="cell small-12 medium-8 large-6"  >
         </div>
-    <!--    <div   style="clear:both">
-            <input type="button" onclick="doAnswer()" class="button" value="提交" />
-        </div>-->
     </div>
 </div>
 
@@ -649,10 +700,28 @@
 </div>
 
 
+
+
+
 <hr/>
 
 </div>
 
+
+<div  id="answer_success" style="position: fixed;display: none; text-align: center; width: 1000px; padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
+    <div class="grid-padding-x">
+        <div class="cell small-12 content_center">
+            <h2>新解锁关卡</h2>
+            <h5>是否进入下一关卡</h5>
+        </div>
+
+        <div class="cell small-12">
+            <input type="button" id="btn_next_level"  class="button" value="下一关" />
+            &nbsp;&nbsp;&nbsp;
+            <input type="button" onclick="closeAnswerSuccess()"  class="button" value="取消" />
+        </div>
+    </div>
+</div>
 
 <script>
 

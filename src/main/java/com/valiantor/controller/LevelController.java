@@ -35,6 +35,15 @@ public class LevelController {
 
     }
 
+    @RequestMapping("updateLevel")
+    public boolean updateLevel(@RequestParam("level") String levelStr){
+
+        Level level = new Gson().fromJson(levelStr, Level.class);
+
+        return levelService.updateLevel(level);
+
+    }
+
     @RequestMapping("findLevelByLNo")
     public Level findLevelByLNo(@RequestParam("lNo") int lNo){
         return levelService.findLevelByLNo(lNo);
@@ -44,5 +53,6 @@ public class LevelController {
     public Level findLevelByGrade(@RequestParam("grade") int grade){
         return levelService.findLevelByGrade(grade);
     }
+
 
 }

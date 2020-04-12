@@ -4,6 +4,7 @@ import com.valiantor.dao.LevelDao;
 import com.valiantor.entity.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -19,6 +20,23 @@ public class LevelService {
 
     public boolean addLevel(Level level){
         int row = levelDao.addLevel(level);
+        return row > 0;
+    }
+
+    public boolean updateLevel(Level level){
+        Level  oldLevel = levelDao.findLevelByLNo(level.getlNo());
+
+
+        if(!StringUtils.isEmpty(level.getDescription())){
+            oldLevel.setDescription(level.getDescription());
+        }
+
+
+        if(level.getRate()>0 && level.getRate()<=100){
+            oldLevel.setRate(level.getRate());
+        }
+
+        int row = levelDao.updateLevel(oldLevel);
         return row > 0;
     }
 

@@ -18,6 +18,8 @@
     <script>
         var currentLevel;
         var lastLevel;
+
+        var currentQuestion;
         $(document).ready(function() {
             findAllLevel();
         });
@@ -130,7 +132,50 @@
                 }
             });
         }
+        function updateLevelInfo(){
+            var level_description = $("#level_description").text().trim();
+            var level_rate = $("#level_rate").text().trim().replace("%","");
 
+            var r = /^\+?[1-9][0-9]*$/;
+            var level = new Object();
+            level.lNo=currentLevel.lNo;
+
+            var isUpdate = false;//是否更新
+            if(level_description == "" || level_description == currentLevel.description) {
+                $("#level_description").text(currentLevel.description);
+            } else {
+                level.description = level_description;
+                isUpdate = true;
+            }
+
+            if(level_rate == "" || !r.test(level_rate)
+                    || level_rate==currentLevel.rate
+                || level_rate > 100) {
+                $("#level_rate").text(currentLevel.rate+"%");
+            } else {
+                level.rate=level_rate;
+                isUpdate = true;
+            }
+
+            if(!isUpdate) return;
+
+            //将可改属性改为false
+            $("#level_description, #level_rate").attr("contenteditable","fasle");
+            var levelStr = JSON.stringify(level);
+            $.ajax({
+                url: "/level/updateLevel", dataType: "text", type: "post", data: {"level":levelStr},
+                success: function (result) {
+                    if(result == "true"){
+
+                    }else{
+                        showPopWindow(1000,"更新失败");
+                    }
+                },
+                error: function (e) {
+                    alert("错误")
+                }
+            });
+        }
 
 
 
@@ -303,13 +348,15 @@
 
                 var td_operation = document.createElement("td");
                 var a_showInfo = document.createElement("a");
-                $(a_showInfo).text("查看 ")
-                var a_edit = document.createElement("a");
-                $(a_edit).text("编辑 ")
+                $(a_showInfo).text("查看 ");
+                $(a_showInfo).click({"quesiton":question},showQuestionInfo);
+
+             /*   var a_edit = document.createElement("a");
+                $(a_edit).text("编辑 ")*/
                 var a_delete = document.createElement("a");
                 $(a_delete).text("删除 ")
                 $(a_delete).click({"qNo":question.qNo},deleteQuestionFromLevel);
-                $(td_operation).append(a_showInfo, a_edit, a_delete);
+                $(td_operation).append(a_showInfo, a_delete);
 
                 $(tr).append(td_description, td_test_point, td_experience_value, td_operation);
 
@@ -319,6 +366,138 @@
 
                 $(tbody).append(tr)
             }
+
+        }
+
+        function showQuestionInfo(d){
+            var question = d.data.question;
+
+            currentQuestion=question;
+            var maxw = document.documentElement.clientWidth;
+            var maxh = document.documentElement.clientHeight;
+            $("#question_info").css({"z-index":"91","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+            $("#question_info").show();
+            $("html").addClass("unfoces");
+            $("body").addClass("unfoces");
+            $("#level_info").addClass("unfoces");
+            $("#add_level").addClass("unfoces");
+
+
+            $("#td_question_description").text(question.description);
+            $("#td_choice_a").text(question.choiceA);
+            $("#td_choice_b").text(question.choiceB);
+            $("#td_choice_c").text(question.choiceC);
+            $("#td_choice_d").text(question.choiceD);
+            $("#td_choice_e").text(question.choiceE);
+            $("#td_correct_choice").text(question.correctOption);
+            $("#td_answer_analysis").text(question.answerAnalysis);
+            $("#td_experience_value").text(question.experienceValue);
+
+        }
+
+        function updateQuestion(){
+            var td_question_description = $("#td_question_description").text().trim();
+            var td_choice_a = $("#td_choice_a").text().trim();
+            var td_choice_b = $("#td_choice_b").text().trim();
+            var td_choice_c = $("#td_choice_c").text().trim();
+            var td_choice_d = $("#td_choice_d").text().trim();
+            var td_choice_e = $("#td_choice_e").text().trim();
+            var td_correct_choice =   $("#td_correct_choice").text().trim();
+            var td_answer_analysis =  $("#td_answer_analysis").text().trim();
+            var td_experience_value = $("#td_experience_value").text().trim();
+
+
+            var question = new Object();
+            var isUpdate = false;
+            question.qNo = currentQuestion.qNo;
+            var r = /^\+?[1-9][0-9]*$/;　　//正整数正则
+            if(! r.test(td_experience_value)){
+               // $("#question_message").text("经验值/分值请输入整数").css({color:"red"});
+                showPopWindow(1000,"分值数值不对");
+                return false;
+            }
+            if(td_question_description == "" || td_question_description == currentQuestion.description){
+                $("#td_question_description").text(currentQuestion.description);
+            }else{
+                isUpdate = true;
+                question.description=td_question_description;
+            }
+
+            if(td_choice_a == "" || td_choice_a==currentQuestion.choiceA){
+                $("#td_choice_a").text(currentQuestion.choiceA);
+            }else{
+                isUpdate = true;
+                question.choiceA=td_choice_a;
+            }
+
+            if(td_choice_b == "" || td_choice_b==currentQuestion.choiceB){
+                $("#td_choice_b").text(currentQuestion.choiceB);
+            }else{
+                isUpdate = true;
+                question.choiceB=td_choice_b;
+            }
+            if(td_choice_c == "" || td_choice_c==currentQuestion.choiceC){
+                $("#td_choice_c").text(currentQuestion.choiceC);
+            }else{
+                isUpdate = true;
+                question.choiceC=td_choice_c;
+            }
+
+            if(td_choice_d == "" || td_choice_d==currentQuestion.choiceD){
+                $("#td_choice_d").text(currentQuestion.choiceD);
+            }else{
+                isUpdate = true;
+                question.choiceD=td_choice_d;
+            }
+
+            if(td_choice_e == "" || td_choice_e==currentQuestion.choiceE){
+                $("#td_choice_e").text(currentQuestion.choiceE);
+            }else{
+                isUpdate = true;
+                question.choiceE=td_choice_e;
+            }
+
+            if(td_correct_choice == "" || td_correct_choice==currentQuestion.correctOption){
+                $("#td_correct_choice").text(currentQuestion.correctOption);
+            }else{
+                isUpdate = true;
+                question.correctOption=td_correct_choice;
+            }
+
+            if(td_answer_analysis == "" || td_answer_analysis==currentQuestion.answerAnalysis){
+                $("#td_answer_analysis").text(currentQuestion.answerAnalysis);
+            }else{
+                isUpdate = true;
+                question.answerAnalysis=td_answer_analysis;
+            }
+            if(td_experience_value == "" || td_experience_value==currentQuestion.experienceValue){
+                $("#td_experience_value").text(currentQuestion.experienceValue);
+            }else{
+                isUpdate = true;
+                question.experienceValue=td_experience_value;
+            }
+
+            if(!isUpdate) return;
+
+
+
+            $("#td_question_description, #td_choice_a, #td_choice_b, #td_choice_c, " +
+                "#td_choice_e, #td_correct_choice, #td_answer_analysis, #td_experience_value").attr("contenteditable","false");
+
+            var questionJson = JSON.stringify(question);
+            $.ajax({
+                url: "/question/updateQuestion", dataType: "text", type: "post",
+                data: {"question":questionJson},
+                success: function (result) {
+                    if(result == "true"){
+                        showPopWindow(1000,"更新成功");
+                    }
+                },
+                error: function (e) {
+                    alert("错误")
+                }
+            });
+
 
         }
 
@@ -342,7 +521,18 @@
             });
 
         }
-        
+
+        function editQuestion(t){
+            $(t).attr("contenteditable","true");
+        }
+
+
+        function editLevelRate(){
+            $("#level_rate").attr("contenteditable","true");
+        }
+        function editLevelDescription(){
+            $("#level_description").attr("contenteditable","true");
+        }
         
         function closeAddLevelPanel(){
             $('#add_level').fadeOut(500);
@@ -365,7 +555,13 @@
             $("#add_level").removeClass("unfoces");
             $("#level_info").removeClass("unfoces");
         }
-
+        function closeQuestionInfoPanel(){
+            $('#question_info').fadeOut(500);
+            $("html").removeClass("unfoces");
+            $("body").removeClass("unfoces");
+            $("#add_level").removeClass("unfoces");
+            $("#level_info").removeClass("unfoces");
+        }
     </script>
 
     <style>
@@ -420,6 +616,7 @@
 <div  id="level_info" style="position: fixed; display: none; padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
     <div class="text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
         <button class="button dark" data-open="comment_panel" id="add_question_button">添加选择题</button>
+        <button class="button dark" data-open="comment_panel" id="update_level_button">编辑当前关卡</button>
         <button onclick="closeLevelInfoPanel()" class="button success">关闭</button>
     </div>
 
@@ -432,13 +629,13 @@
                         <td>关卡等级:</td><td id="level_grade"></td>
                     </tr>
                     <tr>
-                        <td>描述:</td><td id="level_description"></td>
+                        <td>描述:</td><td id="level_description" onblur="updateLevelInfo()"   ondblclick="editLevelDescription()"></td>
                     </tr>
                     <tr>
-                        <td>所需经验:</td><td id="level_experience_need"></td>
+                        <td>所需经验:</td><td id="level_experience_need" ></td>
                     </tr>
                     <tr>
-                        <td>通关率(单位：%):</td><td id="level_rate"></td>
+                        <td>通关率(单位：%):</td><td id="level_rate" onblur="updateLevelInfo()"  ondblclick="editLevelRate()"></td>
                     </tr>
                 </tbody>
             </table>
@@ -453,7 +650,7 @@
                     </thead>
                     <tbody>
                     <tr>
-                        <td></td><td></td><td></td><td><a>查看 </a><a>编辑 </a><a>删除</a></td>
+                        <td></td><td></td><td></td><td><a>查看 </a><a>删除</a></td>
                     </tr>
 
                     </tbody>
@@ -466,6 +663,51 @@
     <hr/>
 
 </div>
+
+
+
+<div  id="question_info" style="position: fixed; display: none; padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
+    <div class="grid-padding-x">
+        <div class="cell small-12 medium-4" id="question_info_content">
+            <table>
+                <tbody>
+                <tr>
+                    <td>问题描述:</td><td id="td_question_description"></td>
+                </tr>
+                <tr>
+                    <td>A选项:</td><td id="td_choice_a" onblur="updateQuestionInfo()"   ondblclick="editQuestion(this)"></td>
+                </tr>
+                <tr>
+                    <td>B选项:</td><td id="td_choice_b" ></td>
+                </tr>
+                <tr>
+                    <td>C选项:</td><td id="td_choice_c" onblur="updateQuestionInfo()"  ondblclick="editQuestion(this)"></td>
+                </tr>
+                <tr>
+                    <td>D选项:</td><td id="td_choice_d" onblur="updateQuestionInfo()"  ondblclick="editQuestion(this)"></td>
+                </tr>
+                <tr>
+                    <td>E选项:</td><td id="td_choice_e" onblur="updateQuestionInfo()"  ondblclick="editQuestion(this)"></td>
+                </tr>
+                <tr>
+                    <td>正确选项:</td><td id="td_correct_choice" onblur="updateQuestionInfo()"  ondblclick="editQuestion(this)"></td>
+                </tr>
+                <tr>
+                    <td>答案解析:</td><td id="td_answer_analysis" onblur="updateQuestionInfo()"  ondblclick="editQuestion(this)"></td>
+                </tr>
+                <tr>
+                    <td>分值:</td><td id="td_experience_value" onblur="updateQuestionInfo()"  ondblclick="editQuestion(this)"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+
 
 <div id="add_level"  style="position: fixed; display: none; padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
     <div class="content_center grid-container" >
@@ -536,6 +778,24 @@
     </div>
 </div>
 
+
+<script>
+
+    function showPopWindow(t,message){
+
+        $("#pop_window").text(message);
+        $("#pop_window").show().fadeOut(t);
+    }
+</script>
+
+<div id="pop_window"   style="border:1px solid red;
+			color: white; background-color: #000000;  opacity:0.9;
+			z-index: 100;
+			width:160px;height:120px; text-align: center; display: none;
+			border-radius: 10px; font-size: 30px; line-height: 120px;
+			position:absolute;left:50%;margin-left:-80px;top:50%;margin-top:-60px;">
+    空白
+</div>
 
 
 <!--底部版权-->

@@ -25,6 +25,12 @@
 
 	</insert>
 
+	<insert id="updateLevel" parameterType="com.valiantor.entity.Level">
+		update  level
+		set  grade=#{level.grade}, experience_need=#{level.experienceNeed}, description=#{level.description}, rate=#{level.rate}
+		where l_no=#{level.lNo}
+	</insert>
+
 	<select id="findLevelByGrade" resultType="com.valiantor.entity.Level">
 		select  * from level
 		where grade= #{grade}

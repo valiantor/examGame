@@ -9,6 +9,7 @@ import com.valiantor.entity.Question;
 import com.valiantor.entity.User;
 import com.valiantor.entity.UserQuestion;
 import com.valiantor.entity.extro.AnswerQuestion;
+import com.valiantor.entity.extro.LevelQuestionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -45,7 +46,8 @@ public class QuestionService {
     }
 
 
-    public List<Question> findRandomQuestionByLNoAndNum(int lNo, int num,String uId) {
+    public LevelQuestionInfo findRandomQuestionByLNoAndNum(int lNo, int num,String uId) {
+        LevelQuestionInfo levelQuestionInfo = new LevelQuestionInfo();
         List<Question> allQuestionList = questionDao.findAllQuestionBylNo(lNo);
         List<UserQuestion> userQuestionList = userQuestionDao.findUserQuestionByUId(uId);
         Set<Integer> qNoSet = new HashSet<>();//该用户做过的题编号
@@ -59,6 +61,10 @@ public class QuestionService {
                 iterator.remove();
             }
         }
+
+        //更新当前关卡题的数量
+        levelQuestionInfo.setRemainingQuestions(allQuestionList.size());
+
         List<Question> questionList = new ArrayList<>();
 
         //从allQuestionList中随机抽取num个问题
@@ -82,7 +88,9 @@ public class QuestionService {
                 n --;
             }
         }
-        return questionList;
+
+        levelQuestionInfo.setQuestionList(questionList);
+        return levelQuestionInfo;
     }
 
     public boolean answerQuestionList(List<AnswerQuestion> answerQuestionList) {
