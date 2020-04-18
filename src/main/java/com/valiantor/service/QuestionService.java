@@ -228,4 +228,10 @@ public class QuestionService {
 
         return true;
     }
+
+    public boolean addQuestionListFromWord(List<Question> questionList){
+        int num=questionDao.updateQuestionList(questionList);
+
+        return num>0;
+    }
 }

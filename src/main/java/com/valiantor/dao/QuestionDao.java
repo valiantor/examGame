@@ -1,10 +1,8 @@
 package com.valiantor.dao;
 
 import com.valiantor.entity.Question;
-
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 @Repository
@@ -18,6 +16,8 @@ public interface QuestionDao {
 
     int addQuestion(@Param("question") Question question);
     int updateQuestion(@Param("question") Question question);
+
+    int updateQuestionList(@Param("questionList") List<Question> questionList);
 
     List<Question> findQuestionFromDB(@Param("offset")int offset, @Param("numPerPage")  int numPerPage);
 }

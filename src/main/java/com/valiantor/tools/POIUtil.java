@@ -6,8 +6,18 @@ import org.apache.poi.hwpf.usermodel.Range;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class POIUtil{
+
+    public static Boolean isStartwithNumber(String  str ){
+        Pattern pattern = Pattern.compile("[0-9]*");
+        Matcher isNum = pattern.matcher(str.charAt(0)+"");
+        if(!isNum.matches()){
+            return false;
+        }
+        return true;}
 
     public static void main(String args[]) throws IOException {
             File file;

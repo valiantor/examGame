@@ -61,6 +61,14 @@
     </update>
 
 
+    <insert id="updateQuestionList" parameterType="java.util.List" >
+        insert into question(question_description,test_point,choice_a,choice_b,choice_c,choice_d,choice_e,correct_option,answer_analysis,experience_value)
+        values
+        <foreach collection="questionList" index="index" item="question" separator="," close=";">
+            (#{question.questionDescription},#{question.testPoint},#{question.choiceA},#{question.choiceB},#{question.choiceC},#{question.choiceD},#{question.choiceE},#{question.correctOption},#{question.answerAnalysis},#{question.experienceValue})
+        </foreach>
+    </insert>
+
 
     <!-- purchase(p_no, title, content, type, publish_date, end_date, c_no, s_id)
             goods(g_no, name, price, participator_path, p_no)

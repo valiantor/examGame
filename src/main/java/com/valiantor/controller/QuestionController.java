@@ -6,20 +6,31 @@ import com.valiantor.entity.Question;
 import com.valiantor.entity.extro.AnswerQuestion;
 import com.valiantor.entity.extro.LevelQuestionInfo;
 import com.valiantor.service.QuestionService;
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.usermodel.Paragraph;
+import org.apache.poi.hwpf.usermodel.Range;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
 @RestController
 @RequestMapping("question")
 public class QuestionController {
+    public static final Logger logger= LoggerFactory.getLogger(QuestionController.class);
     @Autowired
     QuestionService questionService;
 
@@ -130,16 +141,155 @@ public class QuestionController {
     }
 
     @RequestMapping("uploadQuestionFile")
-    public boolean uploadQuestionFile(@RequestParam("file") MultipartFile file){
-        try {
-            file.transferTo(new File("D:\\222.doc"));
+    public boolean uploadQuestionFile(@RequestParam("file") MultipartFile file)  {
+        if(file.isEmpty()){
+            logger.info("文件不能为空，请重新上传");
+            return false;
+        }
+        List<Question> questionList = new ArrayList<>();
+        BufferedReader bufferedReader =null;
+//        File tmpFile = new File("D:\\222.doc");
 
-            return true;
+        try {
+//            FileInputStream fileInputStream = file.getInputStream();
+            HWPFDocument doc =new HWPFDocument(file.getInputStream());
+            Range range = doc.getRange();
+//            System.out.println(range.numParagraphs());
+            Boolean isNewFile=true;
+            Question question = null;
+            Boolean flag=true;
+            String questionStr=null;
+            for (int i=0;i<range.numParagraphs();i++){
+
+                Paragraph paragraph = range.getParagraph(i);
+
+                String txt = paragraph.text();
+                if(StringUtils.isEmpty(txt) || txt.equals("\r")) continue;
+                if(txt.startsWith("A.")||txt.startsWith("A、")){
+                    String [] str=txt.split("\\.",2);
+                    question.setChoiceA(str[1].trim());
+                }else if(txt.startsWith("B.")||txt.startsWith("B、")){
+                    String [] str=txt.split("\\.",2);
+                    question.setChoiceB(str[1].trim());
+
+                }else if(txt.startsWith("C.")||txt.startsWith("C、")){
+                    String [] str=txt.split("\\.",2);
+                    question.setChoiceC(str[1].trim());
+
+                }else if(txt.startsWith("D.")||txt.startsWith("D、")){
+                    String [] str=txt.split("\\.",2);
+                    question.setChoiceD(str[1].trim());
+                }else if(txt.startsWith("E.")||txt.startsWith("E、")){
+                    String [] str=txt.split("\\.",2);
+                    question.setChoiceE(str[1].trim());
+                }else if(txt.startsWith("答案")){
+                    String [] str=txt.split("\\s+",2);
+                    question.setCorrectOption(str[1].trim());
+                    question.setExperienceValue(10);
+                    questionList.add(question);
+                    isNewFile=true;
+                }else{
+                    if(isNewFile && isStartwithNumber(txt)){
+                        question=new Question();
+                        String [] str=txt.split("\\.|、",2);
+                        questionStr = str[1].trim();
+                        isNewFile=false;
+                    } else{
+                        questionStr += txt.trim();
+                    }
+                    if(range.getParagraph(i+1).text().startsWith("A.")||range.getParagraph(i+1).text().startsWith("A、")){
+                        question.setQuestionDescription(questionStr);
+                    }
+
+                }
+            }
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return false;
+        questionService.addQuestionListFromWord(questionList);
+
+        return true;
+
+}
+    public static Boolean isStartwithNumber(String  str ){
+        Pattern pattern = Pattern.compile("[0-9]*");
+        Matcher isNum = pattern.matcher(str.charAt(0)+"");
+        if(!isNum.matches()){
+            return false;
+        }
+        return true;}
+
+
+    public static void main(String[] args) {
+
+//        List<Question> questionList = new ArrayList<>();
+//        try {
+//            FileInputStream fileInputStream = new FileInputStream("D:\\222.doc");
+//            HWPFDocument doc =new HWPFDocument(fileInputStream);
+//            Range range = doc.getRange();
+////            System.out.println(range.numParagraphs());
+//            Boolean isNewFile=true;
+//            Question question = null;
+//            Boolean flag=true;
+//            String questionStr=null;
+//            for (int i=0;i<range.numParagraphs();i++){
+//
+//                Paragraph paragraph = range.getParagraph(i);
+//                String txt = paragraph.text();
+//
+//                //判断字符串以数字开头
+////                if(isStartwithNumber(txt)&&(txt.substring(1,5).contains("、 ")||txt.substring(1,5).contains(". "))){
+////
+////                }
+//                if(txt.startsWith("A.")||txt.startsWith("A、")){
+//                    String [] str=txt.split("\\.",2);
+//                    question.setChoiceA(str[1].trim());
+//                }else if(txt.startsWith("B.")||txt.startsWith("B、")){
+//                    String [] str=txt.split("\\.",2);
+//                    question.setChoiceB(str[1].trim());
+//
+//                }else if(txt.startsWith("C.")||txt.startsWith("C、")){
+//                    String [] str=txt.split("\\.",2);
+//                    question.setChoiceC(str[1].trim());
+//
+//                }else if(txt.startsWith("D.")||txt.startsWith("D、")){
+//                    String [] str=txt.split("\\.",2);
+//                    question.setChoiceD(str[1].trim());
+//                }else if(txt.startsWith("E.")||txt.startsWith("E、")){
+//                    String [] str=txt.split("\\.",2);
+//                    question.setChoiceE(str[1].trim());
+//                }else if(txt.startsWith("答案")){
+//                    String [] str=txt.split("\\s+",2);
+//                    question.setCorrectOption(str[1].trim());
+//                    questionList.add(question);
+//                    isNewFile=true;
+//                }else{
+//                    if(isNewFile && isStartwithNumber(txt)){
+//                        question=new Question();
+//                        String [] str=txt.split("\\.|、",2);
+//                        questionStr = str[1].trim();
+//                        isNewFile=false;
+//                    } else{
+//                        questionStr += txt.trim();
+//                    }
+//                    if(range.getParagraph(i+1).text().startsWith("A.")||range.getParagraph(i+1).text().startsWith("A、")){
+//                        question.setQuestionDescription(questionStr);
+//                    }
+//
+//                }
+//            }
+
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+//        System.out.println(questionList);
+
     }
+
 
 }
