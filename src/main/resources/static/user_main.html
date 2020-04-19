@@ -447,7 +447,7 @@
                     url: "/user/updateUserExperience",
                     dataType: "text",
                     type: "post",
-                    data: "acquireExperience="+currentScore,
+                    data: "acquireExperience="+currentScore+"&currentLNo="+currentLevel.lNo,
                     success: function (result) {
                         if(result == "true"){
                             checkSession();//更新当前用户信息

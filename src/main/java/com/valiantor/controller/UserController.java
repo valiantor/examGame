@@ -96,13 +96,13 @@ public class UserController {
      * @return
      */
     @RequestMapping("updateUserExperience")
-    public boolean updateUserExperience(@RequestParam("acquireExperience") int acquireExperience,HttpSession session){
+    public boolean updateUserExperience(@RequestParam("acquireExperience") int acquireExperience,@RequestParam("currentLNo") int currentLNo,HttpSession session){
 
         Object uIdObj = session.getAttribute("uId");
         if(uIdObj==null) return false;
 
         if(acquireExperience == 0) return false;
-        return userService.updateUserExperience(acquireExperience,String.valueOf(uIdObj));
+        return userService.updateUserExperience(acquireExperience,currentLNo,String.valueOf(uIdObj));
     }
 
 }

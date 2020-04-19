@@ -28,12 +28,12 @@ public class UserService {
         return raw>0;
     }
 
-    public boolean updateUserExperience(int acquireExperience,String uId) {
+    public boolean updateUserExperience(int acquireExperience,int currentLNo,String uId) {
         User user = userDao.findUserByUId(uId);
         Level level = levelDao.findLevelByLNo(user.getCurrentLevelNo());
         if(level != null){
             Level nextLevel = levelDao.findLevelByGrade(level.getGrade() + 1);
-            if(nextLevel != null){
+            if(nextLevel != null && level.getlNo() == currentLNo){
                 user.setCurrentLevelNo(nextLevel.getlNo());
             }
         }
