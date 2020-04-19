@@ -6,6 +6,7 @@ import com.valiantor.entity.Question;
 import com.valiantor.entity.extro.AnswerQuestion;
 import com.valiantor.entity.extro.LevelQuestionInfo;
 import com.valiantor.service.QuestionService;
+import com.valiantor.tools.QuestionTools;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.usermodel.Paragraph;
 import org.apache.poi.hwpf.usermodel.Range;
@@ -163,28 +164,30 @@ public class QuestionController {
 
                 Paragraph paragraph = range.getParagraph(i);
 
-                String txt = paragraph.text();
+                String txt = paragraph.text().trim();
                 if(StringUtils.isEmpty(txt) || txt.equals("\r")) continue;
-                if(txt.startsWith("A.")||txt.startsWith("A、")){
-                    String [] str=txt.split("\\.",2);
-                    question.setChoiceA(str[1].trim());
-                }else if(txt.startsWith("B.")||txt.startsWith("B、")){
-                    String [] str=txt.split("\\.",2);
-                    question.setChoiceB(str[1].trim());
 
-                }else if(txt.startsWith("C.")||txt.startsWith("C、")){
-                    String [] str=txt.split("\\.",2);
-                    question.setChoiceC(str[1].trim());
+                String choiceA = QuestionTools.getChoiceA(txt);
+                String choiceB = QuestionTools.getChoiceB(txt);
+                String choiceC = QuestionTools.getChoiceC(txt);
+                String choiceD = QuestionTools.getChoiceD(txt);
+                String choiceE = QuestionTools.getChoiceE(txt);
+                String correctAnswer = QuestionTools.getCorrectAnswer(txt);
+                if(choiceA != null){
 
-                }else if(txt.startsWith("D.")||txt.startsWith("D、")){
-                    String [] str=txt.split("\\.",2);
-                    question.setChoiceD(str[1].trim());
-                }else if(txt.startsWith("E.")||txt.startsWith("E、")){
-                    String [] str=txt.split("\\.",2);
-                    question.setChoiceE(str[1].trim());
-                }else if(txt.startsWith("答案")){
-                    String [] str=txt.split("\\s+",2);
-                    question.setCorrectOption(str[1].trim());
+                    question.setChoiceA(choiceA);
+                }else if(choiceB != null){
+
+                    question.setChoiceB(choiceB);
+
+                }else if(choiceC != null){
+                    question.setChoiceC(choiceC);
+                }else if(choiceD != null){
+                    question.setChoiceD(choiceD);
+                }else if(choiceE != null){
+                    question.setChoiceE(choiceE);
+                }else if(correctAnswer != null){
+                    question.setCorrectOption(correctAnswer);
                     question.setExperienceValue(10);
                     questionList.add(question);
                     isNewFile=true;
