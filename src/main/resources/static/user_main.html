@@ -29,7 +29,7 @@
         var currentRemainingQuestions;//当前关卡答题剩余题量
         var needScore ;
 
-        var currentAquireScore=0;//当前答题需要加的经验
+        var currentAquireScore = 0;//当前答题需要加的经验
 
 
         var lock = false;//同步锁
@@ -420,7 +420,8 @@
                         updateScore(0);
                     }else{
                         if(result >0 ){
-                            currentAquireScore+=result;
+                            currentAquireScore+=parseInt(result);
+                            //currentAquireScore+=result;
                         }
                         updateScore(currentQuestion.experienceValue);
                     }

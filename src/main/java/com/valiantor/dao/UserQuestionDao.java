@@ -15,4 +15,6 @@ public interface UserQuestionDao {
         int addUserQuestionList(@Param("userQuestionList") List<UserQuestion> userQuestionList);
 
     List<UserQuestion> getErrorQuestionList(String uId);
+
+    List<UserQuestion> findUserQuestionByUIdAndLNo(@Param("uId") String uId,@Param("lNo") int lNo);
 }

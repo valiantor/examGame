@@ -53,6 +53,7 @@ public class QuestionService {
 
         LevelQuestionInfo levelQuestionInfo = new LevelQuestionInfo();
         List<Question> allQuestionList = questionDao.findAllQuestionBylNo(lNo);
+        List<Question> unDoQuestionList = new ArrayList<>();
 
         List<UserQuestion> userQuestionList = userQuestionDao.findUserQuestionByUId(uId);
         if(user.getCurrentLevelNo() <= lNo){//如果是在当前关卡答题，则进行筛选，否则不筛选
@@ -64,8 +65,8 @@ public class QuestionService {
             Iterator<Question> iterator = allQuestionList.iterator();
             while(iterator.hasNext()){
                 Question next = iterator.next();
-                if(qNoSet.contains(next.getqNo())){
-                    iterator.remove();
+                if(!qNoSet.contains(next.getqNo())){
+                    unDoQuestionList.add(next);
                 }
             }
         }
@@ -78,7 +79,6 @@ public class QuestionService {
         //从allQuestionList中随机抽取num个问题
         if(num>=allQuestionList.size()){
             questionList.addAll(allQuestionList);
-            List<Integer> qNoList = new ArrayList<>();
             //筛选出错题
             Iterator<UserQuestion> userQuestionIterator = userQuestionList.iterator();
             while(userQuestionIterator.hasNext()){
@@ -87,6 +87,7 @@ public class QuestionService {
                     userQuestionIterator.remove();
                 }
             }
+            List<Integer> qNoList = new ArrayList<>();
 
             for(int i = 0;(i<num-allQuestionList.size() && i< userQuestionList.size());i++){
                 qNoList.add(userQuestionList.get(i).getqNo());
@@ -94,6 +95,18 @@ public class QuestionService {
             if(!CollectionUtils.isEmpty(qNoList)){
                 questionList.addAll(questionDao.findQuestionByQNoList(qNoList));
             }
+
+            qNoList = new ArrayList<>();
+            if(questionList.size()<num){
+                for(int i = 0;(i<num-questionList.size() && i< allQuestionList.size());i++){
+                    qNoList.add(allQuestionList.get(i).getqNo());
+                }
+            }
+
+            if(!CollectionUtils.isEmpty(qNoList)){
+                questionList.addAll(questionDao.findQuestionByQNoList(qNoList));
+            }
+
         }else{
             //否则就从中随机抽取num个
             int n = num;

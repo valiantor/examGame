@@ -25,6 +25,10 @@
 		select * from user_question
 		where u_id = #{uId}
 	</select>
+	<select id="findUserQuestionByUIdAndLNo" resultType="com.valiantor.entity.UserQuestion" >
+		select * from user_question
+		where u_id = #{uId} and l_no=#{lNo}
+	</select>
 	<select id="findUserQuestionByUIdAndQNo" resultType="com.valiantor.entity.UserQuestion">
 		select * from user_question
 		where u_id = #{uId} and q_no = #{qNo}
