@@ -25,7 +25,10 @@
 		select * from user_question
 		where u_id = #{uId}
 	</select>
-
+	<select id="findUserQuestionByUIdAndQNo" resultType="com.valiantor.entity.UserQuestion">
+		select * from user_question
+		where u_id = #{uId} and q_no = #{qNo}
+	</select>
 
     <!-- purchase(p_no, title, content, type, publish_date, end_date, c_no, s_id)
             goods(g_no, name, price, participator_path, p_no)

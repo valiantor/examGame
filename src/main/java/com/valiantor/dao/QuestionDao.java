@@ -19,5 +19,7 @@ public interface QuestionDao {
 
     int updateQuestionList(@Param("questionList") List<Question> questionList);
 
+    int updateQuestionLNoByLNo(@Param("lNo") int lNo);
+
     List<Question> findQuestionFromDB(@Param("offset")int offset, @Param("numPerPage")  int numPerPage);
 }

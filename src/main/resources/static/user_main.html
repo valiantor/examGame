@@ -29,6 +29,8 @@
         var currentRemainingQuestions;//当前关卡答题剩余题量
         var needScore ;
 
+        var currentAquireScore=0;//当前答题需要加的经验
+
 
         var lock = false;//同步锁
         $(document).ready(function() {
@@ -68,7 +70,7 @@
                 $(div2).addClass("grid-padding-x content_center").css({"box-shadow": "10px 10px 5px #888888","width":"150px","border-radius": "5px"});
                 var div3_1 = document.createElement("div");
 
-                if(currentUser.experience >= level.experienceNeed && currentUser.currentLevelNo >= level.lNo){
+                if(currentUser.currentLevelNo >= level.lNo){
                     $(div3_1).addClass("large-12 medium-12 ").css({"overflow":"hidden","background-color":"#3adb76", "height":"100px"});
                 }else{
                     $(div3_1).addClass("large-12 medium-12 ").css({"overflow":"hidden","background-color":"#cacaca", "height":"100px"});
@@ -84,10 +86,10 @@
                 div2.append(div3_2);
                 div1.append(div2);
 
-                if(currentUser.experience >= level.experienceNeed && currentUser.currentLevelNo >= level.lNo){
+                if(currentUser.currentLevelNo >= level.lNo){
                     $(div2).click({"level":level},showLevelInfo);
                 }else{
-                    $(span).text("关卡"+grade+"(所需经验:"+level.experienceNeed+")");
+                 //   $(span).text("关卡"+grade+"(所需经验:"+level.experienceNeed+")");
                 }
                 $("#content").append(div1);
 
@@ -391,9 +393,11 @@
                 type: "post",
                 data: "answerQuestion="+JSON.stringify(answerQuestion),
                 success: function (result) {
-                    var correct = "错误";
-                    if(result == "true"){
-                        correct="正确";
+
+                  //  alert(result)
+                    var correct = "正确"
+                    if(result == -1){
+                        correct="错误";
                     }
                     //将当前关卡剩余题
                     //不管正确与否，都将答案解析展示出来
@@ -412,10 +416,13 @@
                     $("#submit_or_close").click(closeQuestionPanel);
 
 
-                    if(result == "true"){
-                        updateScore(currentQuestion.experienceValue);
-                    }else{
+                    if(result == -1){
                         updateScore(0);
+                    }else{
+                        if(result >0 ){
+                            currentAquireScore+=result;
+                        }
+                        updateScore(currentQuestion.experienceValue);
                     }
                 },
                 error: function (e) {
@@ -442,19 +449,20 @@
             //判断本次答题是否闯关成功
             if(currentScore>=needScore){
                 //闯关成功
-
+               // alert(currentAquireScore);
                 $.ajax({
                     url: "/user/updateUserExperience",
                     dataType: "text",
                     type: "post",
-                    data: "acquireExperience="+currentScore+"&currentLNo="+currentLevel.lNo,
+                    data: "acquireExperience="+currentAquireScore+"&currentLNo="+currentLevel.lNo,
                     success: function (result) {
+                        //alert(result)
                         if(result == "true"){
                             checkSession();//更新当前用户信息
                             $("#user_experience").text("经验值："+currentUser.experience);
                             var nextLevel = findLevelByGrade(currentLevel.grade+1);
                             //alert("下一关卡："+nextLevel.grade+",currentScore:"+currentScore+",needScore:"+needScore);
-                            if(nextLevel != null && currentUser.experience >= nextLevel.experienceNeed){
+                            if(nextLevel != null){
                                 var maxw = document.documentElement.clientWidth;
                                 var maxh = document.documentElement.clientHeight;
                                 $("#answer_success").css({"z-index":"95","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});

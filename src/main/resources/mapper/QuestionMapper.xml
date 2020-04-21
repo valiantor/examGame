@@ -25,7 +25,11 @@
             l_no=#{question.lNo}
         where q_no=#{question.qNo}
     </update>
-
+    <update id="updateQuestionLNoByLNo" parameterType="int">
+        update question
+        set l_no = null
+        where l_no = #{lNo}
+    </update>
 
     <select id="findQuestionByQNoList" resultType="com.valiantor.entity.Question" parameterType="java.util.List">
         select * from question

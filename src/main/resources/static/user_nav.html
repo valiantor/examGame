@@ -1,9 +1,6 @@
     <meta charset="UTF-8">
     <script>
-
-
         function checkSession(){
-
             $.ajax({
                 url:"/user/getCurrentUser",
                 type: "get",
@@ -11,11 +8,9 @@
                 success: function (result) {
                     //alert(result);
                     if(result == "" || null == result) {
-
                         window.location="user_login.html";
                         $("#admin_info").text("未登录");
                     }else{
-
                         currentUser = $.parseJSON(result);
                         $("#user_name").text(currentUser.name+" 已登陆");
                         $("#user_login").addClass("invisible");
@@ -27,7 +22,6 @@
                 }
             });
         }
-
         checkSession();
 
     </script>

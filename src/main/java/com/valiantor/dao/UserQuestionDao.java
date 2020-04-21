@@ -10,6 +10,9 @@ import java.util.List;
 public interface UserQuestionDao {
 
     List<UserQuestion> findUserQuestionByUId(String uId);
+    List<UserQuestion> findUserQuestionByUIdAndQNo(@Param("uId") String uId,@Param("qNo")int qNo);
 
-    int addUserQuestionList(@Param("userQuestionList") List<UserQuestion> userQuestionList);
+        int addUserQuestionList(@Param("userQuestionList") List<UserQuestion> userQuestionList);
+
+    List<UserQuestion> getErrorQuestionList(String uId);
 }

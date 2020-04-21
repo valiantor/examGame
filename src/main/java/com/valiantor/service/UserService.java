@@ -41,6 +41,5 @@ public class UserService {
         user.setExperience(user.getExperience()+acquireExperience);
 
        return userDao.updateUser(user) > 0;
-
     }
 }

@@ -48,18 +48,25 @@ public class QuestionService {
 
 
     public LevelQuestionInfo findRandomQuestionByLNoAndNum(int lNo, int num,String uId) {
+
+        User user = userDao.findUserByUId(uId);
+
         LevelQuestionInfo levelQuestionInfo = new LevelQuestionInfo();
         List<Question> allQuestionList = questionDao.findAllQuestionBylNo(lNo);
+
         List<UserQuestion> userQuestionList = userQuestionDao.findUserQuestionByUId(uId);
-        Set<Integer> qNoSet = new HashSet<>();//该用户做过的题编号
-        for(UserQuestion uq: userQuestionList){
-            qNoSet.add(uq.getqNo());
-        }
-        Iterator<Question> iterator = allQuestionList.iterator();
-        while(iterator.hasNext()){
-            Question next = iterator.next();
-            if(qNoSet.contains(next.getqNo())){
-                iterator.remove();
+        if(user.getCurrentLevelNo() <= lNo){//如果是在当前关卡答题，则进行筛选，否则不筛选
+
+            Set<Integer> qNoSet = new HashSet<>();//该用户做过的题编号
+            for(UserQuestion uq: userQuestionList){
+                qNoSet.add(uq.getqNo());
+            }
+            Iterator<Question> iterator = allQuestionList.iterator();
+            while(iterator.hasNext()){
+                Question next = iterator.next();
+                if(qNoSet.contains(next.getqNo())){
+                    iterator.remove();
+                }
             }
         }
 
@@ -71,8 +78,16 @@ public class QuestionService {
         //从allQuestionList中随机抽取num个问题
         if(num>=allQuestionList.size()){
             questionList.addAll(allQuestionList);
-            //然后从
             List<Integer> qNoList = new ArrayList<>();
+            //筛选出错题
+            Iterator<UserQuestion> userQuestionIterator = userQuestionList.iterator();
+            while(userQuestionIterator.hasNext()){
+                UserQuestion next = userQuestionIterator.next();
+                if("Y".equals(next.getCorrectness())){
+                    userQuestionIterator.remove();
+                }
+            }
+
             for(int i = 0;(i<num-allQuestionList.size() && i< userQuestionList.size());i++){
                 qNoList.add(userQuestionList.get(i).getqNo());
             }
@@ -193,11 +208,11 @@ public class QuestionService {
         return questionDao.updateQuestion(oldQuestion) > 0;
     }
 
-    public boolean answerQuestion(AnswerQuestion answerQuestion) {
+    public int answerQuestion(AnswerQuestion answerQuestion) {
 
         Question question = questionDao.findQuestionByQNo(answerQuestion.getqNo());
 
-        if(question == null) return false;
+        if(question == null) return -1;
 
         UserQuestion userQuestion = new UserQuestion();
         userQuestion.setqNo(question.getqNo());
@@ -207,13 +222,21 @@ public class QuestionService {
         if(question.getCorrectOption().equals(answerQuestion.getChoice())){
             userQuestion.setCorrectness("Y");
         }
-        List<UserQuestion> userQuestionList = new ArrayList<>();
-        userQuestionList.add(userQuestion);
 
-        userQuestionDao.addUserQuestionList(userQuestionList);
-        return "Y".equals(userQuestion.getCorrectness());
+        List<UserQuestion> userQuestions = userQuestionDao.findUserQuestionByUIdAndQNo(answerQuestion.getuId(), answerQuestion.getqNo());
+        if(!CollectionUtils.isEmpty(userQuestions) && "Y".equals(userQuestions.get(0).getCorrectness())){
+            //用户已经做过该题
+            if(question.getCorrectOption().equals(answerQuestion.getChoice())) return 0;
+            else return -1;
+        }else{
+            //未做过或做错了
+            List<UserQuestion> userQuestionList = new ArrayList<>();
+            userQuestionList.add(userQuestion);
+            userQuestionDao.addUserQuestionList(userQuestionList);
+            if(question.getCorrectOption().equals(answerQuestion.getChoice())) return question.getExperienceValue();
+            else return -1;
+        }
     }
-
 
     public List<Question> findQuestionFromDB(int currentPage, int numPerPage) {
         int offset =(currentPage-1)*numPerPage;
@@ -233,5 +256,12 @@ public class QuestionService {
         int num=questionDao.updateQuestionList(questionList);
 
         return num>0;
+    }
+
+    public List<Question> getErrorQuestionList(String uId) {
+
+        //userQuestionDao.getErrorQuestionList(uId);
+
+        return null;
     }
 }

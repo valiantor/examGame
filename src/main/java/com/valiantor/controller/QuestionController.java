@@ -100,6 +100,18 @@ public class QuestionController {
 
         return questionService.findQuestionPageBylNo(lNo,currentPage,numPerPage);
     }
+    @RequestMapping(value = "getErrorQuestionList")
+    public List<Question> getErrorQuestionList(HttpSession session){
+        Object uIdObj = session.getAttribute("uId");
+        String uId = null;
+        if(uIdObj != null) {
+            uId = String.valueOf(uIdObj);
+        }
+        return questionService.getErrorQuestionList(uId);
+    }
+
+
+
     @RequestMapping("deleteQuestionFromLevel")
     public Boolean deleteQuestionFromLevel(@RequestParam("qNo") int qNo){
 
@@ -131,11 +143,11 @@ public class QuestionController {
     }
 
     @RequestMapping("answerQuestion")
-    public boolean answerQuestion(@RequestParam("answerQuestion") String answerQuestionJson){
+    public int answerQuestion(@RequestParam("answerQuestion") String answerQuestionJson){
 
         AnswerQuestion answerQuestion = new Gson().fromJson(answerQuestionJson, AnswerQuestion.class);
 
-        if(answerQuestion == null) return false;
+        if(answerQuestion == null) return -1;
 
 
         return questionService.answerQuestion(answerQuestion);

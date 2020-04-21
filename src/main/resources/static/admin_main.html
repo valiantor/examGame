@@ -21,8 +21,13 @@
 
         var currentQuestion;
 
+        var allLevelList;
+
         var currentPage = 1;//分页
         var numPerPage = 6;//分页
+
+
+        var allQuestionList;
         $(document).ready(function() {
             findAllLevel();
         });
@@ -33,6 +38,7 @@
                 dataType: "text",
                 success: function (result) {
                    var levelList = $.parseJSON(result);
+                    allLevelList = levelList;
                    loadAllLevel(levelList);
                 },
                 error: function (e) {
@@ -394,9 +400,15 @@
                     $("#level_rate").text(currentLevel.rate+"%");
 
                     $("#add_question_button").click({"lNo":lNo},showAddQuestion);
+                    if(currentLevel.lNo == allLevelList[allLevelList.length-1].lNo){
+                        $("#delete_level").show();
+                        $("#delete_level").click(deleteLevel);
+                    }
+
+                    allQuestionList = $.parseJSON(result);
                    // alert(result)
                     if(result != ""){
-                        loadQuestions($.parseJSON(result));
+                        loadQuestions(allQuestionList);
                     }
                 },
                 error: function (e) {
@@ -680,6 +692,27 @@
         }
 
 
+        function deleteLevel(){
+            var r = confirm("确认要删除吗？删除之后不能回退");
+            if (r == true) {
+                $.ajax({
+                    url: "/level/deleteLevel",
+                    type: "post",
+                    data:"lNo="+currentLevel.lNo,
+                    dataType:"text",
+                    success:function(result){
+                        if(result=="true"){
+                            showPopWindow(1000,"删除成功")
+                            closeLevelInfoPanel(true);
+                            findAllLevel();
+                        }
+                    },
+                    error:function(e){
+                        showPopWindow(1000,"网络错误")
+                    }
+                });
+            }
+        }
         
         function closeAddQuestionFromDb(){
             $('#add_question_from_db').fadeOut(500);
@@ -697,7 +730,22 @@
             $("#level_info").removeClass("unfoces");
             $("#add_question_from_db").removeClass("unfoces");
         }
-        function closeLevelInfoPanel(){
+        function closeLevelInfoPanel(t){
+            if(t){
+
+            }else{
+                var grade= currentLevel.grade;
+                var row = Math.floor(grade/2 +3);//矩阵行数
+                var col = Math.floor((grade-1)/2 + 3);//矩阵列数
+                var s = row*col;
+                var q = Math.floor((s+1)/2);//问题数量
+                if(allQuestionList.length < q){
+                    alert("题目数量不够，至少需要添加"+q+"个题，请继续添加！！！")
+                    return;
+                }
+            }
+
+
             $('#level_info').fadeOut(500);
             $("html").removeClass("unfoces");
             $("body").removeClass("unfoces");
@@ -773,9 +821,9 @@
 
 <div  id="level_info" style="position: fixed; display: none; padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
     <div class="text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
-        <button class="button dark" data-open="comment_panel" onclick="addQuestionFromDb()">从题库添加选择题</button>
-        <button class="button dark" data-open="comment_panel" id="add_question_button">添加选择题</button>
-
+        <button class="button dark"  onclick="addQuestionFromDb()">从题库添加选择题</button>
+        <button class="button dark"  id="add_question_button">添加选择题</button>
+        <button class="button warning" style="display: none"  id="delete_level">删除此关卡</button>
         <button onclick="closeLevelInfoPanel()" class="button success">关闭</button>
     </div>
 

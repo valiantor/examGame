@@ -1,6 +1,7 @@
 package com.valiantor.service;
 
 import com.valiantor.dao.LevelDao;
+import com.valiantor.dao.QuestionDao;
 import com.valiantor.entity.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,9 @@ public class LevelService {
 
     @Autowired
     private LevelDao levelDao;
+
+    @Autowired
+    private QuestionDao questionDao;
 
     public List<Level> findAllLevel(){
         return levelDao.findAllLevel();
@@ -48,5 +52,14 @@ public class LevelService {
     public Level findLevelByLNo(int lNo) {
         return levelDao.findLevelByLNo(lNo);
 
+    }
+
+    public boolean deleteLevel(int lNo) {
+       questionDao.updateQuestionLNoByLNo(lNo);
+       int n2 = levelDao.deleteLevel(lNo);
+
+       if (n2 > 0) return true;
+
+       return false;
     }
 }

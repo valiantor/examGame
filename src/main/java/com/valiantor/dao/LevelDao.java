@@ -14,4 +14,6 @@ public interface LevelDao {
     public int updateLevel(@Param("level") Level level);
     public Level findLevelByGrade(int grade);
     Level findLevelByLNo(int lNo);
+
+    int deleteLevel(int lNo);
 }

@@ -41,6 +41,12 @@ public class LevelController {
         Level level = new Gson().fromJson(levelStr, Level.class);
 
         return levelService.updateLevel(level);
+    }
+
+    @RequestMapping("deleteLevel")
+    public boolean deleteLevel(@RequestParam("lNo") int lNo){
+
+        return levelService.deleteLevel(lNo);
 
     }
 

@@ -36,6 +36,10 @@
 		where grade= #{grade}
 	</select>
 
+	<delete id="deleteLevel" parameterType="int">
+		delete from level where l_no = #{lNo}
+
+	</delete>
 
 
     <!-- purchase(p_no, title, content, type, publish_date, end_date, c_no, s_id)
