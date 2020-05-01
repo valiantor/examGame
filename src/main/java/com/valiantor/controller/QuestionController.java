@@ -207,12 +207,16 @@ public class QuestionController {
                     if(isNewFile && isStartwithNumber(txt)){
                         question=new Question();
                         String [] str=txt.split("\\.|、",2);
-                        questionStr = str[1].trim();
+                        if(str.length<2){
+                            questionStr = txt;
+                        }else{
+                            questionStr = str[1].trim();
+                        }
                         isNewFile=false;
                     } else{
                         questionStr += txt.trim();
                     }
-                    if(range.getParagraph(i+1).text().startsWith("A.")||range.getParagraph(i+1).text().startsWith("A、")){
+                    if(QuestionTools.getChoiceA(range.getParagraph(i+1).text().trim()) != null){
                         question.setQuestionDescription(questionStr);
                     }
 
