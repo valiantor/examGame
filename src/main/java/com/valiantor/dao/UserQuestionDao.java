@@ -1,6 +1,7 @@
 package com.valiantor.dao;
 
 import com.valiantor.entity.UserQuestion;
+import com.valiantor.entity.extro.UserQuestionInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -17,4 +18,6 @@ public interface UserQuestionDao {
     List<UserQuestion> getErrorQuestionList(String uId);
 
     List<UserQuestion> findUserQuestionByUIdAndLNo(@Param("uId") String uId,@Param("lNo") int lNo);
+
+    List<UserQuestion> getUserQuestionInfoByPage(@Param("offset")int offset,@Param("numPerPage") int numPerPage);
 }

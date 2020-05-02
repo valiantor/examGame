@@ -26,6 +26,8 @@
         var currentPage = 1;//分页
         var numPerPage = 6;//分页
 
+        var answerQuestionCurrentPage = 1;
+        var answerQuestionNumPerPage = 10;
 
         var allQuestionList;
         $(document).ready(function() {
@@ -84,24 +86,24 @@
         function addLevel(){
 
             var grade = $("#grade").val();
-            var experience_need = $("#experience_need").val();
+          // var experience_need = $("#experience_need").val();
             var description = $("#description").val();
             var rate = $("#rate").val();
 
             var r = /^\+?[1-9][0-9]*$/;　　//正整数正则
 
-            if(grade=="" || experience_need == "" || description == "" || rate == ""){
+            if(grade=="" || description == "" || rate == ""){
                 $("#level_message").text("请输入完整").css({color:"red"});
                 return false;
             }
-            if(! r.test(experience_need)){
+    /*        if(! r.test(experience_need)){
                 $("#level_message").text("所需经验应为整数").css({color:"red"});
                 return false;
             }
             if(experience_need <= lastLevel.experienceNeed){
                 $("#level_message").text("所需经验应大于"+lastLevel.experienceNeed).css({color:"red"});
                 return false;
-            }
+            }*/
 
             if(! r.test(rate)){
                 $("#level_message").text("通过率应为整数").css({color:"red"});
@@ -113,7 +115,7 @@
             }
             var level = new Object();
             level.grade = grade;
-            level.experienceNeed = experience_need;
+            level.experienceNeed = 0;
             level.description = description;
             level.rate = rate;
 
@@ -713,7 +715,103 @@
                 });
             }
         }
-        
+
+
+
+        function showAnswerQuestionHistory(currentPage,numPerPage){
+            $.ajax({
+                url: "/userQuestion/getUserQuestionInfoByPage",
+                type: "post",
+                data:"currentPage="+currentPage+"&numPerPage="+numPerPage,
+                dataType:"text",
+                success:function(result){
+                    if(result!=""){
+
+                        var maxw = document.documentElement.clientWidth;
+                        var maxh = document.documentElement.clientHeight;
+                        $("#answer_question_history").css({"z-index":"90","backgroundColor":"white","position":"fixed",width:maxw+"px",height:maxh+"px","top":"50%","left":"50%","margin-left":(-maxw/2)+"px","margin-top":(-maxh/2)+"px"});
+                        $("#answer_question_history").show();
+                        $("html").addClass("unfoces");
+                        $("body").addClass("unfoces");
+
+
+                        userQuestionInfoList = $.parseJSON(result);
+                        if(answerQuestionCurrentPage <= 1){
+                            $("#previous_page").hide();
+                        }else{
+                            $("#previous_page").show();
+                        }
+                        if(userQuestionInfoList.length < answerQuestionNumPerPage){
+                            //隐藏下一页
+                            $("#next_page").hide();
+                        }else{
+                            $("#next_page").show();
+                        }
+                        loadAnswerQuestionHistoryList(userQuestionInfoList);
+                    }
+                },
+                error:function(e){
+                    showPopWindow(1000,"网络错误")
+                }
+            });
+        }
+
+        function previousPage(){
+            answerQuestionCurrentPage --;
+            showAnswerQuestionHistory(answerQuestionCurrentPage,answerQuestionNumPerPage)
+        }
+        function nextPage(){
+            answerQuestionCurrentPage ++;
+            showAnswerQuestionHistory(answerQuestionCurrentPage,answerQuestionNumPerPage)
+        }
+
+        function loadAnswerQuestionHistoryList(userQuestionInfoList){
+            var tbody = $("#answer_question_list tbody");
+            $(tbody).empty();
+
+            for(var i = 0;i<userQuestionInfoList.length;i++) {
+                var userQuestionInfo = userQuestionInfoList[i];
+                var question = userQuestionInfo.question;
+                var userQuestion = userQuestionInfo.userQuestion;
+                var user = userQuestionInfo.user;
+                var level = userQuestionInfo.level;
+                var tr = document.createElement("tr");
+                var td_level = document.createElement("td");
+                var td_description = document.createElement("td");
+                var td_experience_value = document.createElement("td");
+                var td_answer_user = document.createElement("td");
+
+                var td_correctness = document.createElement("td");
+                var td_answer_time = document.createElement("td");
+
+                var a_showInfo = document.createElement("a");
+                $(a_showInfo).text(question.questionDescription);
+                $(a_showInfo).click({"question":question},showAnswerQuestionInfo);
+
+
+                $(td_level).text("关卡"+level.grade)
+                $(td_description).append(a_showInfo)
+                $(td_experience_value).text(question.experienceValue)
+                $(td_answer_user).text(user.name)
+                $(td_correctness).text(userQuestion.correctness=="Y"?"正确":"错误")
+                $(td_answer_time).text(userQuestion.date)
+
+                $(tr).append(td_level,td_description, td_experience_value,td_answer_user,td_correctness,td_answer_time);
+
+                $(tbody).append(tr)
+            }
+        }
+
+        function showAnswerQuestionInfo(d){
+
+            showQuestionInfo(d)
+
+        }
+        function closeAnswerQuestionHistory(){
+            $('#answer_question_history').fadeOut(500);
+            $("html").removeClass("unfoces");
+            $("body").removeClass("unfoces");
+        }
         function closeAddQuestionFromDb(){
             $('#add_question_from_db').fadeOut(500);
             $("html").removeClass("unfoces");
@@ -962,6 +1060,7 @@
 
 
 
+
 <div id="add_level"  style="position: fixed; display: none; padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
     <div class="content_center grid-container" >
         <div class="text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
@@ -971,9 +1070,9 @@
         <label for="grade">关卡等级
             <input type="text" placeholder="grade" readonly id="grade" >
         </label>
-        <label for="experience_need">所需经验
+<!--        <label for="experience_need">所需经验
             <input type="text" placeholder="解锁关卡所需要的经验值" id="experience_need">
-        </label>
+        </label>-->
         <label for="description">描述
             <input type="text" placeholder="关卡描述" id="description">
         </label>
@@ -999,6 +1098,48 @@
     </div>
 </div>
 
+
+
+<div  id="answer_question_history" style="position: fixed; display: none; padding: 1rem;overflow-y: auto;overflow-scrolling: inherit">
+    <div class="text-right" style="position: sticky;position: -webkit-sticky; top: 0px;">
+        <button onclick="previousPage()" class="button success" id="previous_page">上一页</button>
+        <button onclick="nextPage()" class="button success" id="next_page">下一页</button>
+        <button onclick="closeAnswerQuestionHistory()" class="button success">关闭</button>
+    </div>
+
+    <div class="grid-padding-x">
+
+        <div class="cell small-12 medium-8" id="answer_question_list">
+            <div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>关卡</th><th>问题描述</th><th>分值</th><th>答题人</th><th>正确性</th><th>时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><input type="checkbox" value="1"/></td> <td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" value="1"/></td> <td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" value="1"/></td> <td></td><td></td><td></td>
+                    </tr>
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+    <hr/>
+
+</div>
 
 
 

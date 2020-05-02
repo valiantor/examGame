@@ -25,6 +25,12 @@
 		select * from user_question
 		where u_id = #{uId}
 	</select>
+    <select id="getUserQuestionInfoByPage" resultType="com.valiantor.entity.UserQuestion">
+		select * from user_question
+		order by u_q_no desc
+		limit #{offset},#{numPerPage}
+
+	</select>
 	<select id="findUserQuestionByUIdAndLNo" resultType="com.valiantor.entity.UserQuestion" >
 		select * from user_question
 		where u_id = #{uId} and l_no=#{lNo}
