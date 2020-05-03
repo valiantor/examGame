@@ -398,7 +398,7 @@
                     $("#level_title").text("关卡"+currentLevel.grade);
                     $("#level_grade").text(currentLevel.grade);
                     $("#level_description").text(currentLevel.description);
-                    $("#level_experience_need").text(currentLevel.experienceNeed);
+                 //   $("#level_experience_need").text(currentLevel.experienceNeed);
                     $("#level_rate").text(currentLevel.rate+"%");
 
                     $("#add_question_button").click({"lNo":lNo},showAddQuestion);
@@ -936,9 +936,9 @@
                     <tr>
                         <td>描述:</td><td id="level_description" onblur="updateLevelInfo()"   ondblclick="editLevelDescription()"></td>
                     </tr>
-                    <tr>
+                  <!--  <tr>
                         <td>所需经验:</td><td id="level_experience_need" ></td>
-                    </tr>
+                    </tr>-->
                     <tr>
                         <td>通关率(单位：%):</td><td id="level_rate" onblur="updateLevelInfo()"  ondblclick="editLevelRate()"></td>
                     </tr>
