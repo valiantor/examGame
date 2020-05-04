@@ -117,7 +117,7 @@
         $("#level_title").text("关卡"+currentLevel.grade);
         $("#level_grade").text(currentLevel.grade);
         $("#level_description").text(currentLevel.description);
-        $("#level_experience_need").text(currentLevel.experienceNeed);
+       // $("#level_experience_need").text(currentLevel.experienceNeed);
         $("#level_rate").text(currentLevel.rate+"%");
 
         $("#start_answer_button").click({"lNo":currentLevel.lNo},showStartAnswer);
@@ -476,7 +476,7 @@
                                 $("#btn_next_level").click({"nextLevel":nextLevel},intoNextLevel);
 
                             }else{
-                                alert("恭喜你！！本次答题闯关成功，距离下一关卡还差"+(nextLevel.experienceNeed-currentUser.experience)+"分，请努力");
+                                alert("恭喜你！！本次答题闯关成功");
                                 closeQuestionPanel();
                                 closeAnswerQuestionPanel();
                             }
@@ -616,9 +616,9 @@
                 <tr>
                     <td>描述:</td><td id="level_description"></td>
                 </tr>
-                <tr>
+          <!--      <tr>
                     <td>所需经验:</td><td id="level_experience_need"></td>
-                </tr>
+                </tr>-->
                 <tr>
                     <td>通关率(单位：%):</td><td id="level_rate"></td>
                 </tr>
